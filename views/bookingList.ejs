@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Admin-Booking List</title>
+    <style>
+        div.dataTables_wrapper {
+            margin: 0 auto;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+            color: white !important;
+            background: linear-gradient(to bottom, #ffffff 0%, rgb(255, 255, 255) 100%);
+            background-color: #ffffff;
+            border: #ffffff;
+        }
+
+        .dataTables_scrollBody {
+            position: relative;
+            overflow: auto;
+            width: 100%;
+            margin-top: -18px;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button {
+            padding: 0px;
+        }
+
+        .page-item.active .page-link {
+            color: #02C6C4;
+            background-color: #ffffff;
+            border-color: #dee2e6;
+        }
+
+        .pagination>li>a {
+            color: #02C6C4;
+        }
+
+        .pagination>li>a,
+        .pagination>li>span {
+            position: relative;
+            float: left;
+            padding: 6px 12px;
+            margin-left: -1px;
+            line-height: 1.42857143;
+            text-decoration: none;
+            background-color: #fff;
+            border: 1px solid #ddd;
+        }
+
+        .page-link {
+            /* position: relative; */
+            display: block;
+            padding: .5rem .75rem;
+            /* margin-left: -1px; */
+            line-height: 1.25;
+            color: #007bff;
+            /* background-color: #fff; */
+            border: 1px solid #dee2e6;
+        }
+
+        input[type=number]::-webkit-outer-spin-button,
+        input[type=number]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+
+        /* .dataTables_filter, */
+        .dataTables_info,
+        .dataTables_length {
+            display: none;
+        }
+
+        #bookinglist_table_filter {
+            display: none;
+        }
+
+        .dataTables_paginate {
+            display: none;
+        }
+    </style>
+
+</head>
+
+<body id="page-top">
+    <%- include header.ejs %>
+    <div id="wrapper">
+        <%- include sidenav.ejs %>
+        <div id="content-wrapper">
+            <div class="container-fluid">
+                <input type="hidden" value="<%= data %>" id="userId">
+                <input type="hidden" id="userProfileId" class="form-control">
+                <div class="container" id="bookingList">
+                    <!-- <section id="bookinglist" class="listings no-transition"> -->
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-md-12 margin-20px-top margin-30px-bottom">
+                                <h3 class="text-capitalize text-dark-blue font-weight-300">Booking List</h3>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-3" style="margin-left:728px;">
+                                <input type="text" id="searchBooking" oninput="searchBooking()">
+                            </div>
+                            <!-- <div class="col-sm-3">
+                                <input type="text" id="searchName" onkeyup="searchName()" placeholder="Name">
+                            </div> -->
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12 margin-30px-bottom">
+                                <table id="bookinglist_table" class="table table-striped table-bordered"
+                                    style="width:100%;">
+                                    <thead>
+                                        <tr>
+                                            <th>Booking State</th>
+                                            <th>Booking Status</th>
+                                            <th>Booking #</th>
+                                            <th>Booked</th>
+                                            <th>Itinerary</th>
+                                            <th>Host Name</th>
+                                            <th>Guest Name</th>
+                                            <th>Traveller Mobile</th>
+                                            <th>Host Mobile</th>
+                                            <th>Address</th>
+                                            <th class="text-right">Total Booking Amount</th>
+                                            <th class="text-right">Total Amount Paid</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="pull-right" id="pagination-here"></div>
+                    </div>
+                    <div class="modal fade" id="cancelBooking" tabindex="-1" role="dialog"
+                        aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleModalLabel">Cancel booking</h5>
+                                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">×</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">Are you sure to cancel this booking?</div>
+                                <div class="modal-footer">
+                                    <button class="btn btn-secondary btn-rounded" type="button"
+                                        data-dismiss="modal">Cancel</button>
+                                    <button class="btn btn-blue btn-rounded"
+                                        onclick="confirmCancellation()">Confirm</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal fade" id="confirmCancellationMessage" tabindex="-1" role="dialog"
+                        aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleModalLabel">Booking Cancelled</h5>
+                                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">×</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">You have successfully cancelled this booking.</div>
+                                <div class="modal-footer">
+                                    <button class="btn btn-blue btn-rounded"
+                                        onclick="window.location.reload()">Ok</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- </section> -->
+                    <script>
+                        var tablelength;
+                        var page = 0;
+                        var itemDataArray = [];
+                        var userId = document.getElementById("userId").value;
+                        $(document).ready(function () {
+                            getbookingList(page);
+                        })
+
+                        function searchBooking() {
+                            var edValue = document.getElementById("searchBooking").value;
+                            if (edValue === "") {
+                                getbookingList(page);
+                            } else {
+                                var searchValue = {
+                                    "bookingNo": edValue,
+                                    "mobileNo": ""
+                                }
+                                $.ajax({
+                                    type: "POST",
+                                    contentType: "application/json",
+                                    headers: {
+                                        "Content-Type": "application/json",
+                                        Authorization: localStorage.getItem('token') || '',
+                                    },
+                                    dataType: 'json',
+                                    data: JSON.stringify(searchValue),
+
+                                    url: globalUrl + 'v1/user/' + userId + '/booking/admin/bookinglist/newone/?page=' + page + '&size=10',
+                                    success: function (result, textStatus, xhr) {
+                                        document.getElementById('pagination-here').style.display = "none";
+                                        var bookingStatus;
+                                        $("#bookinglist_table").dataTable().fnClearTable();
+                                        $("#bookinglist_table").dataTable().fnDestroy();
+
+                                        $.each(result.content, function (i, item) {
+                                            checkinDt = moment(item.checkInDate).format('MMM DD');
+                                            checkoutDt = moment(item.checkOutDate).format('MMM DD');
+                                            var bookingDate = moment(item.bookingDate).format("MMM DD, YYYY");
+
+                                            if (item.bookingState == "Cancelled") {
+                                                bookingStatus = ""
+                                            } else {
+                                                bookingStatus = item.bookingStatus;
+                                            }
+                                            if (item.bookingState == "Cancelled" || item.bookingStatus == "Checked Out" || item.bookingStatus == "Checked In" || item.bookingState == "Failed") {
+                                                $('<tr>').html('<td scope="row">' + item.bookingState + '</td><td>' + bookingStatus + '</td><td>' + item.bookingNo + '</td><td>' + bookingDate + '</td><td>' + checkinDt + '-' + checkoutDt + '</td><td>' + item.hostName + '</td><td>' + item.guestName + '</td><td>' + item.travMobileNo + '</td><td>' + item.hostMobileNo + '</td><td>' + item.fullAddress + '</td><td class="text-right">$ ' + item.bookingAmt + '</td><td class="text-right">$ ' + item.totalPaidAmt + '</td><td></td>').appendTo('#bookinglist_table');
+                                            } else {
+                                                $('<tr>').html('<td scope="row">' + item.bookingState + '</td><td>' + bookingStatus + '</td><td>' + item.bookingNo + '</td><td>' + bookingDate + '</td><td>' + checkinDt + '-' + checkoutDt + '</td><td>' + item.hostName + '</td><td>' + item.guestName + '</td><td>' + item.travMobileNo + '</td><td>' + item.hostMobileNo + '</td><td>' + item.fullAddress + '</td><td class="text-right">$ ' + item.bookingAmt + '</td><td class="text-right">$ ' + item.totalPaidAmt + '</td><td><button class="btn btn-blue btn-rounded" onclick="cancelBooking()">Cancel</button></td>').appendTo('#bookinglist_table');
+                                            }
+                                        });
+                                        $('#bookinglist_table').DataTable({
+                                            "scrollX": true
+                                        })
+                                        $('#pagination-here').twbsPagination({
+                                            totalPages: result.totalPages,
+                                            visiblePages: 1
+                                        });
+                                    },
+                                    error: function (jqXHR, textStatus, errorThrown) {
+
+                                    }
+
+                                });
+                            }
+                        }
+
+                        function getbookingList(page) {
+                            document.getElementById('pagination-here').style.display = "block";
+                            $.ajax({
+                                url: globalUrl + 'v1/user/' + userId + '/booking/admin/bookinglist/?page=' + page + '&size=10',
+                                type: 'GET',
+                                headers: {
+                                    Authorization: localStorage.getItem('token') || '',
+                                },
+                                dataType: 'json',
+                                success: function (result, textStatus, xhr) {
+                                    var bookingStatus;
+                                    $("#bookinglist_table").dataTable().fnClearTable();
+                                    $("#bookinglist_table").dataTable().fnDestroy();
+
+                                    $.each(result.content, function (i, item) {
+                                        checkinDt = moment(item.checkInDate).format('MMM DD');
+                                        checkoutDt = moment(item.checkOutDate).format('MMM DD');
+                                        var bookingDate = moment(item.bookingDate).format("MMM DD, YYYY");
+
+                                        if (item.bookingState == "Cancelled") {
+                                            bookingStatus = ""
+                                        } else {
+                                            bookingStatus = item.bookingStatus;
+                                        }
+                                        if (item.bookingState == "Cancelled" || item.bookingStatus == "Checked Out" || item.bookingStatus == "Checked In" || item.bookingState == "Failed") {
+                                            $('<tr>').html('<td scope="row">' + item.bookingState + '</td><td>' + bookingStatus + '</td><td>' + item.bookingNo + '</td><td>' + bookingDate + '</td><td>' + checkinDt + '-' + checkoutDt + '</td><td>' + item.hostName + '</td><td>' + item.guestName + '</td><td>' + item.travMobileNo + '</td><td>' + item.hostMobileNo + '</td><td>' + item.fullAddress + '</td><td class="text-right">$ ' + item.bookingAmt + '</td><td class="text-right">$ ' + item.totalPaidAmt + '</td><td></td>').appendTo('#bookinglist_table');
+                                        } else {
+                                            $('<tr>').html('<td scope="row">' + item.bookingState + '</td><td>' + bookingStatus + '</td><td>' + item.bookingNo + '</td><td>' + bookingDate + '</td><td>' + checkinDt + '-' + checkoutDt + '</td><td>' + item.hostName + '</td><td>' + item.guestName + '</td><td>' + item.travMobileNo + '</td><td>' + item.hostMobileNo + '</td><td>' + item.fullAddress + '</td><td class="text-right">$ ' + item.bookingAmt + '</td><td class="text-right">$ ' + item.totalPaidAmt + '</td><td><button class="btn btn-blue btn-rounded" onclick="cancelBooking()">Cancel</button></td>').appendTo('#bookinglist_table');
+                                        }
+                                    });
+                                    $('#bookinglist_table').DataTable({
+                                        "scrollX": true
+                                    })
+                                    $('#pagination-here').twbsPagination({
+                                        totalPages: result.totalPages,
+                                        visiblePages: 5,
+                                        onPageClick: function (event, page) {
+                                            --page;
+                                            getbookingList(page);
+                                        }
+                                    });
+                                },
+                                error: function (xhr, textStatus, errorThrown) {
+                                    console.log('Error in Database');
+                                    // console.log(errorThrown);
+                                }
+                            });
+                        }
+
+                        function cancelBooking() {
+                            var table = document.getElementById("bookinglist_table");
+                            var rows = table.getElementsByTagName("tr");
+                            for (i = 0; i < rows.length; i++) {
+                                var currentRow = table.rows[i];
+                                var createClickHandler =
+                                    function (row) {
+                                        return function () {
+                                            var bookingNo = row.cells[2].innerHTML;
+                                            sessionStorage.setItem('bookingNo', bookingNo);
+                                            $('#cancelBooking').modal('show');
+                                        };
+                                    };
+                                currentRow.onclick = createClickHandler(currentRow);
+                            }
+                        }
+
+                        function confirmCancellation() {
+                            var bookingNo = sessionStorage.getItem('bookingNo');
+                            $.ajax({
+                                type: 'PUT',
+                                data: '',
+                                headers: {
+                                    "content-type": "application/json",
+                                    Authorization: localStorage.getItem('token') || ''
+                                },
+                                dataType: 'json',
+                                url: globalUrl + 'v1/user/' + userId + '/booking/' + bookingNo + '/cancel',
+                                success: function (result) {
+                                    $('#cancelBooking').modal('hide');
+                                    $('#confirmCancellationMessage').modal('show');
+                                    // window.location.reload();
+                                },
+                                error: function (xhr, textStatus, errorThrown) {
+                                    console.log(xhr);
+                                }
+                            });
+                        }
+                    </script>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <%- include footer.ejs %>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twbs-pagination/1.4.2/jquery.twbsPagination.min.js"></script>
+</body>
+
+</html>

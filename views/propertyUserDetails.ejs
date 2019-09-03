@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <title>Admin-User Dashboard</title>
+
+  <!-- Bootstrap core CSS-->
+  <link href="../vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="icon" href="../public/images/wemaste-favicon.png">
+
+  <!-- Custom fonts for this template-->
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css"
+    integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="../public/stylesheets/core.css" />
+  <link rel="stylesheet" href="../public/stylesheets/style.css" />
+
+  <!-- Page level plugin CSS-->
+  <!-- <link href="../vendor/datatables/dataTables.bootstrap4.css" rel="stylesheet"> -->
+
+  <!-- Custom styles for this template-->
+  <link href="../public/stylesheets/sb-admin.css" rel="stylesheet">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
+  <script src="../public/javascripts/global.js"></script>
+
+  <style>
+    #dobstyle {
+      white-space: nowrap;
+    }
+
+    form {
+      margin: 20px 0;
+    }
+
+    form input,
+    button {
+      padding: 5px;
+    }
+
+    /* .dataTables_filter, */
+    .dataTables_info,
+    .dataTables_length {
+      display: none;
+    }
+  </style>
+
+</head>
+
+<body id="page-top">
+  <%- include header.ejs %>
+  <div id="wrapper">
+    <%- include sidenav.ejs %>
+    <div id="content-wrapper">
+      <div class="container-fluid">
+        <!-- <button id="export" class="btn btn-blue btn-small btn-rounded pull-right">Export To CSV</button>
+          <br><br> -->
+        <div class="card mb-3">
+          <div class="card-header">
+            <i class="fas fa-table"></i>
+            User Records</div> <br>
+          <div class="row">
+            <div class="col-md-12 margin-30px-bottom">
+              <table id="userDetails_table" class="table table-striped table-bordered">
+                <thead>
+                  <tr>
+                    <th>Sr.no</th>
+                    <th>Full Name</th>
+                    <th>Mobile Number</th>
+                    <th>Email Id</th>
+                    <th id="dobstyle">Date of Birth</th>
+                    <th style="display:none;">User Id</th>
+                    <th>Modify User</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+          <!-- <div class="card-footer small text-muted">Updated yesterday at 11:59 PM</div> -->
+        </div>
+
+      </div>
+      <script>
+        var baseUrl = globalUrl;
+        $(document).ready(function () {
+          $.ajax({
+
+            headers: {
+              "content-type": "application/json",
+              Authorization: localStorage.getItem('token') || ''
+            },
+            type: "GET",
+            url: baseUrl + 'v1/admin/user',
+            success: function (result) {
+              var cnt = 1;
+              $.each(result, function (i, item) {
+                var date = moment(item.dobDt).format("MM-DD-YYYY");
+                $('<tr>').html('<td scope="row">' + cnt + '</td><td>' + item.fullName + '</td><td>' + item.mobileNo1 + '</td><td>' + item.emailId + '</td><td id="dobstyle">' + date + '</td><td style="display:none;">' + item.userId + '</td><td><button class="btn btn-blue btn-rounded btn-large" role="button" onclick="editData()">Modify</button></td>').appendTo('#userDetails_table');
+                cnt++;
+              });
+              $('#userDetails_table').DataTable({
+                // "scrollX": true,
+                "paging": true,
+                "searching": true,
+                "scrollCollapse": true
+              });
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+              console.log('update Stock error: ' + textStatus);
+            }
+
+          });
+        });
+      </script>
+      <!-- /.container-fluid -->
+
+    </div>
+    <!-- /.content-wrapper -->
+
+  </div>
+  <!-- /#wrapper -->
+  <%- include footer.ejs %>
+
+
+  <script>
+
+    // $('#export').click(function () {
+    //   var titles = [];
+    //   var data = [];
+    //   $('#userDetails_table th').each(function () {
+    //     titles.push($(this).text());
+    //   });
+    //   $('#userDetails_table td').each(function () {
+    //     data.push($(this).text());
+    //   });
+    //   var CSVString = prepCSVRow(titles, titles.length, '');
+    //   CSVString = prepCSVRow(data, titles.length, CSVString);
+    //   var downloadLink = document.createElement("a");
+    //   var blob = new Blob(["\ufeff", CSVString]);
+    //   var url = URL.createObjectURL(blob);
+    //   downloadLink.href = url;
+    //   downloadLink.download = "userDetails.csv";
+    //   document.body.appendChild(downloadLink);
+    //   downloadLink.click();
+    //   document.body.removeChild(downloadLink);
+    // });
+    // function prepCSVRow(arr, columnCount, initial) {
+    //   var row = ''; // this will hold data
+    //   var delimeter = ','; // data slice separator, in excel it's `;`, in usual CSv it's `,`
+    //   var newLine = '\r\n'; // newline separator for CSV row
+    //   function splitArray(_arr, _count) {
+    //     var splitted = [];
+    //     var result = [];
+    //     _arr.forEach(function (item, idx) {
+    //       if ((idx + 1) % _count === 0) {
+    //         splitted.push(item);
+    //         result.push(splitted);
+    //         splitted = [];
+    //       } else {
+    //         splitted.push(item);
+    //       }
+    //     });
+    //     return result;
+    //   }
+    //   var plainArr = splitArray(arr, columnCount);
+    //   plainArr.forEach(function (arrItem) {
+    //     arrItem.forEach(function (item, idx) {
+    //       row += item + ((idx + 1) === arrItem.length ? '' : delimeter);
+    //     });
+    //     row += newLine;
+    //   });
+    //   return initial + row;
+    // }
+
+    function editData() {
+      var table = document.getElementById("userDetails_table");
+      var rows = table.getElementsByTagName("tr");
+      for (i = 0; i < rows.length; i++) {
+        var currentRow = table.rows[i];
+        var createClickHandler =
+          function (row) {
+            return function () {
+              var name = row.getElementsByTagName("td")[1];
+              var fullName = name.innerHTML;
+              sessionStorage.setItem('fullName', fullName);
+
+              var mobile = row.getElementsByTagName("td")[2];
+              var mobileNo = mobile.innerHTML;
+              sessionStorage.setItem('mobileNo', mobileNo);
+
+              var email = row.getElementsByTagName("td")[3];
+              var emailId = email.innerHTML;
+              sessionStorage.setItem('emailId', emailId);
+
+              var birthday = row.getElementsByTagName("td")[4];
+              var birthdate = birthday.innerHTML;
+              sessionStorage.setItem('birthdate', birthdate);
+
+              var userid = row.getElementsByTagName("td")[5];
+              var userId = userid.innerHTML;
+              sessionStorage.setItem('userId', userId);
+            };
+          };
+        currentRow.onclick = createClickHandler(currentRow);
+      }
+      location.href = '/profile';
+    }
+
+    function deleteData() {
+      window.location.reload();
+    }
+
+    function activateData() {
+
+    }
+  </script>
+
+</body>
+
+</html>

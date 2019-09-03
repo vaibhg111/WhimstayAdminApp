@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Admin-Contact Us</title>
+    <style>
+        form {
+            margin: 20px 0;
+        }
+
+        form input,
+        button {
+            padding: 5px;
+        }
+
+        table {
+            width: 70%;
+            margin-bottom: 20px;
+            border-collapse: collapse;
+        }
+
+        table,
+        th,
+        td {
+            border: 1px solid #FC97B9;
+        }
+
+        table th,
+        table td {
+            padding: 10px;
+            text-align: center;
+        }
+    </style>
+
+</head>
+
+<body id="page-top">
+    <%- include header.ejs %>
+    <div id="wrapper">
+        <%- include sidenav.ejs %>
+        <div id="content-wrapper">
+
+            <div class="container-fluid">
+                <input type="hidden" value="<%= data %>" id="userId">
+                <input type="hidden" id="userProfileId" class="form-control">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-12 margin-30px-bottom">
+                            <div class="container-fluid">
+                                <input type="hidden" value="<%= data %>" id="userId">
+                                <input type="hidden" id="userProfileId" class="form-control">
+                                <div class="container">
+                                    <div id="faqSectionDisplay" style="margin-top:15px;"></div>
+                                </div>
+                            </div>
+                            <script>
+                                var baseURL = globalUrl;
+                                $(document).ready(function () {
+                                    $.ajax({
+                                        type: "GET",
+                                        contentType: "application/json",
+                                        headers: {
+                                            "content-type": "application/json",
+                                            Authorization: localStorage.getItem('token') || ''
+                                        },
+
+                                        url: baseURL + 'v1/users/' + document.getElementById("userId").value + '/support/contact/contactType/0',
+                                        success: function (result) {
+                                            result.forEach(element => {
+                                                sessionStorage.setItem("contactUsID", element.contactId);
+                                                $('#faqSectionDisplay').append('<div><h5 class="text-capitalize text-dark-blue font-weight-300 margin-20px-bottom">Contact Us</h5>' +
+                                                    '<div class="form-group"><div class="col-md-3"><label for="workAddress" class="">Address : </label></div>' +
+                                                    '<div class="col-md-9"><input type="text" class="form-control" id="workAddress" value="' + element.address + '" name="workAddress" onkeypress="validateInput()" maxlength="75"><span id="contactaddErrDisplay" style="color: red;"></span></div></div>' +
+                                                    '<div class="form-group"><div class="col-md-3"><label for="website" class="">Website : </label></div>' +
+                                                    '<div class="col-md-9"><input type="text" class="form-control" id="website" value="' + element.website + '" name="website" onkeypress="validateInput()" maxlength="75"><span id="contactwebErrDisplay" style="color: red;"></span></div></div>' +
+                                                    '<div class="form-group"><div class="col-md-3"><label for="mailUs" class="">Mail Us At : </label></div>' +
+                                                    '<div class="col-md-9"><input type="text" class="form-control" id="email" value="' + element.emailId + '" name="mailUs" onkeypress="validateEmail()" maxlength="75"><span id="contactmailErrDisplay" style="color: red;"></span></div></div>' +
+                                                    '<div class="form-group"><div class="col-md-3"><label for="callOn" class="">Call Us On : </label></div>' +
+                                                    '<div class="col-md-9"><input type="text" class="form-control" id="callOn" max="10" name="callOn" onkeypress="return validatePhn(event)" value="' + element.mobileNo + '" maxlength="10"><span id="contactmobErrDisplay" style="color: red;"></span></div></div>')
+                                            });
+                                            $('#faqSectionDisplay').append('<button class="btn btn-blue btn-rounded pull-right" type="button" onclick="validate()" style="margin-right: 20px;">Save</button>');
+                                        },
+                                        error: function (jqXHR, textStatus, errorThrown) {
+
+                                        }
+
+                                    });
+                                });
+
+                                // function backContact() {
+                                //     window.location.reload();
+                                // }
+
+                                function validateInput() {
+                                    document.getElementById("contactaddErrDisplay").innerHTML = "";
+                                    document.getElementById("contactwebErrDisplay").innerHTML = "";
+                                }
+
+                                function validateEmail() {
+                                    document.getElementById("contactmailErrDisplay").innerHTML = "";
+                                    var mailId = document.getElementById("email").value;
+                                    var v = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+                                    if (v.test(email.value) == false) {
+                                        document.getElementById("contactmailErrDisplay").innerHTML = "Invalid Email Address.";
+                                        email.focus();
+                                        return false;
+                                    } else {
+                                        document.getElementById("contactmailErrDisplay").innerHTML = "";
+                                    }
+                                }
+
+                                function validatePhn(event) {
+                                    document.getElementById("contactmobErrDisplay").innerHTML = "";
+                                    var charCode = event.which || event.keyCode;
+                                    if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+                                        return false;
+                                    }
+                                    return true;
+                                }
+
+                                function validate() {
+                                    var mob = document.getElementById("callOn").value;
+                                    if (document.getElementById("workAddress").value == null || document.getElementById("workAddress").value == undefined || document.getElementById("workAddress").value == "") {
+                                        document.getElementById("contactaddErrDisplay").innerHTML = "Please enter address";
+                                        return false;
+                                    } else {
+                                        document.getElementById("contactaddErrDisplay").innerHTML = "";
+                                    }
+
+                                    if (document.getElementById("website").value == null || document.getElementById("website").value == undefined || document.getElementById("website").value == "") {
+                                        document.getElementById("contactwebErrDisplay").innerHTML = "Please enter website.";
+                                        return false;
+                                    } else {
+                                        document.getElementById("contactwebErrDisplay").innerHTML = "";
+                                    }
+
+                                    if (document.getElementById("email").value == null || document.getElementById("email").value == undefined || document.getElementById("email").value == "") {
+                                        document.getElementById("contactmailErrDisplay").innerHTML = "Please enter mail address.";
+                                        return false;
+                                    } else {
+                                        document.getElementById("contactmailErrDisplay").innerHTML = "";
+                                    }
+
+                                    if (document.getElementById("callOn").value == null || document.getElementById("callOn").value == undefined || document.getElementById("callOn").value == "") {
+                                        document.getElementById("contactmobErrDisplay").innerHTML = "Please enter mobile number.";
+                                        return false;
+                                    } else {
+                                        document.getElementById("contactmobErrDisplay").innerHTML = "";
+                                    }
+
+                                    if (mob.length > 10 || mob.length < 10) {
+                                        document.getElementById("contactmobErrDisplay").innerHTML = "Mobile number should be of 10 digits.";
+                                        return false;
+                                    } else {
+                                        document.getElementById("contactmobErrDisplay").innerHTML = "";
+                                    }
+                                    editContact();
+                                }
+
+                                function editContact() {
+                                    var contactId = sessionStorage.getItem("contactUsID");
+                                    var contactType = 0; //hardcoded for both
+                                    var address = document.getElementById("workAddress").value;
+                                    var mobile = document.getElementById("callOn").value;
+                                    var website = document.getElementById("website").value;
+                                    var mail = document.getElementById("email").value;
+
+                                    var contactList = {
+                                        "address": address,
+                                        "mobileNo": mobile,
+                                        "website": website,
+                                        "emailId": mail,
+                                        "contactType": contactType
+                                    }
+                                    $.ajax({
+                                        type: 'PUT',
+                                        data: JSON.stringify(contactList),
+                                        contentType: "application/json",
+                                        headers: {
+                                            "content-type": "application/json",
+                                            Authorization: localStorage.getItem('token') || ''
+                                        },
+                                        dataType: 'json',
+                                        url: baseURL + 'v1/users/' + document.getElementById("userId").value + '/support/contact/' + contactId,
+                                        success: function (result) {
+                                            window.location.reload();
+                                        },
+                                        error: function (xhr, textStatus, errorThrown) {
+
+                                        }
+                                    });
+                                }
+                            </script>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <%- include footer.ejs %>
+</body>
+
+</html>

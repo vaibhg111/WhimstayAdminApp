@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Admin-Claim Booking</title>
+    <style>
+        div.dataTables_wrapper {
+            margin: 0 auto;
+        }
+
+        input[type=number]::-webkit-outer-spin-button,
+        input[type=number]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+
+        hr {
+            display: block;
+            height: 1px;
+            border: 0;
+            border-top: 1px solid #ccc;
+            margin: 1em 0;
+            padding: 0;
+        }
+
+        .dataTables_filter,
+        .dataTables_info,
+        .dataTables_length {
+            display: none;
+        }
+
+        .dataTables_filter,
+        .dataTables_info,
+        .dataTables_length {
+            display: none;
+        }
+    </style>
+
+</head>
+
+<body id="page-top">
+    <%- include header.ejs %>
+    <div id="wrapper">
+        <%- include sidenav.ejs %>
+
+        <div id="content-wrapper">
+
+            <div class="container-fluid">
+                <input type="hidden" value="<%= data %>" id="userId">
+                <input type="hidden" value="<%= pmcId %>" id="pmcId">
+
+                <input type="hidden" id="userProfileId" class="form-control">
+                <div class="container">
+                    <div id="bookingRefundId"></div>
+
+                    <script>
+                        var totalDeposit;
+                        $(document).ready(function () {
+                            $.ajax({
+                                type: "GET",
+                                contentType: "application/json",
+                                headers: {
+                                    "content-type": "application/json",
+                                    Authorization: localStorage.getItem('token') || ''
+                                },
+
+                                url: globalUrl + 'admin/pmcId/' + document.getElementById("pmcId").value + '/claimDetails/' + sessionStorage.getItem("depositId"),
+                                success: function (result) {
+                                    console.log(JSON.stringify(result));
+                                    var settlement, buttonStatus, buttonDisabled;
+                                    var refund;
+                                    var claimNumber;
+                                    if (result.settlement == null) {
+                                        settlement = "";
+                                    } else {
+                                        settlement = result.settlement.toFixed(2);
+                                    }
+                                    if (result.settlementStatus == 1) {
+                                        buttonStatus = '<button class="btn btn-blue btn-rounded" disabled>Submit</button>';
+                                        buttonDisabled = '<button class="btn btn-blue btn-rounded" disabled">Submit</button>'
+                                    } else {
+                                        buttonStatus = '<button class="btn btn-blue btn-rounded" onclick="submitNewNote()">Submit</button>';
+                                        buttonDisabled = '<button class="btn btn-blue btn-rounded" onclick="validateSettlement()">Submit</button>'
+                                    }
+                                    
+                                    if (result.claimNumber == null || result.claimNumber == undefined) {
+                                        claimNumber = "";
+                                    } else {
+                                        claimNumber = result.claimNumber;
+                                    }
+
+                                    if (result.hostName == null || result.hostName == undefined) {
+                                        hostName = "";
+                                    } else {
+                                        hostName = result.hostName;
+                                    }
+                                    if (result.refund == null) {
+                                        refund = 0.00;
+                                    } else {
+                                        refund = result.refund.toFixed(2);
+                                    }
+
+                                    var cnt = 0;
+                                    totalDeposit = result.totalDeposit;
+                                    var claimDate = moment(result.claimDate).format('MMM DD YYYY');
+                                    var mobile = result.mobileNo;
+                                    mobile = mobile.replace(/(\d{3})(\d{3})(\d{4})/, '($1) $2-$3')
+                                    $('#bookingRefundId').append('<h6>Claim # ' + claimNumber + '</h6><hr /><div class="row"><div id="Status" style="float:left;margin: 25px;"><strong>Status : </strong>' + result.status + ' </div><div id="date" style="float:left;margin: 25px;"><strong>Date : </strong>' + claimDate + '</div>' +
+                                        '<div id="deposit" style="float:left;margin: 25px;"><strong>Deposit : </strong>' + result.totalDeposit.toFixed(2) + '</div><div id="settlement" style="float:left;margin: 25px;"><strong>Settlement : </strong>' + settlement + '</div><div id="refunded" style="float:left;margin: 25px;"><strong>Refunded : </strong>' + refund + '</div></div>' +
+                                        '<div class="row"><div id="bookingno" style="float:left;margin: 25px;"><strong>Booking Number : </strong>' + result.bookingNumber + '</div><div id="host" style="float:left;margin: 25px;"><strong>Host : </strong>' + hostName + '</div><div id="phone" style="float:left;margin: 25px;"><strong>Phone : </strong>' + mobile + '</div>' +
+                                        '<div id="email" style="float:left;margin: 25px;"><strong>Email : </strong>' + result.email + '</div></div><hr /><div class="form-group" id="claimNoteDiv"></div>' +
+                                        '</div><div class="form-group"><span id="newNote"><b>New Note :</b><textarea id="addnewNote" onkeypress="validateInput()"></textarea></span><span id="addnewNote1" style="display:none;color:red;">Please add a Note.</span></div>' + buttonStatus + '</div><hr />' +
+                                        '<div class="form-group"><div class="col-sm-4" style="padding:0px;"><div id="settlementAmountspan"><b>Settlement Amount :</b><input type="number" min=0 id="settlementAmount" onInput="return check(event,value)" step="0.01" onkeypress="validateInput()"></div></div><span id="settlementAmountspan1" style="display:none;color:red;">Please fill Settlement Amount.</span><span id="settlementNotespan"><b>Settlement Note :</b>' +
+                                        '<textarea id="settlementNote" onkeypress="validateInput()"></textarea></span><span id="settlementNotespan1" style="display:none;color:red;">Please fill Settlement Note.</span>' + buttonDisabled + '</div>');
+                                    result.depositClaimNote.forEach(element => {
+                                        var createDt = moment(element.createDt).format('MM/DD/YYYY');
+                                        $('#claimNoteDiv').append('<div class="form-group"><div id="claimNoteDiv' + cnt + '"><b>Note ' + createDt + ' :</b></div><span id="claimNote' + cnt + '">' + element.claimNote + '</span>');
+                                        cnt++;
+                                    });
+                                },
+                                error: function (jqXHR, textStatus, errorThrown) {
+
+                                }
+
+                            });
+                        })
+                        function submitNewNote() {
+                            if (document.getElementById("addnewNote").value == null || document.getElementById("addnewNote").value == "") {
+                                document.getElementById('addnewNote1').style.display = "block";
+                                document.getElementById("addnewNote").focus();
+                                return false;
+                            } else {
+                                document.getElementById("addnewNote1").style.display = "none";
+                            }
+
+                            var addnewNote = document.getElementById("addnewNote").value;
+                            var depositId = sessionStorage.getItem("depositId");
+                            var newNoteList = {
+                                "depositId": depositId,
+                                "claimNote": addnewNote
+                            }
+                            $.ajax({
+                                type: "POST",
+                                contentType: "application/json",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                    Authorization: localStorage.getItem('token') || '',
+                                },
+                                dataType: 'json',
+                                headers: {
+                                    "content-type": "application/json",
+                                    Authorization: localStorage.getItem('token') || ''
+                                },
+                                data: JSON.stringify(newNoteList),
+
+                                url: globalUrl + 'admin/pmcId/' + document.getElementById("pmcId").value + '/claimDetails/admin',
+                                success: function (result) {
+                                    window.location.reload();
+                                },
+                                error: function (jqXHR, textStatus, errorThrown) {
+
+                                }
+
+                            });
+                        }
+
+                        function validateSettlement() {
+                            if (document.getElementById("settlementNote").value == null || document.getElementById("settlementNote").value == "") {
+                                document.getElementById('settlementNotespan1').style.display = "block";
+                                document.getElementById("settlementNote").focus();
+                                return false;
+                            } else {
+                                document.getElementById("settlementNotespan1").style.display = "none";
+                            }
+
+                            if (document.getElementById("settlementAmount").value == null || document.getElementById("settlementAmount").value == "") {
+                                document.getElementById('settlementAmountspan1').style.display = "block";
+                                document.getElementById("settlementAmount").focus();
+                                return false;
+                            } else {
+                                document.getElementById("settlementAmountspan1").style.display = "none";
+                            }
+
+                            if (document.getElementById("settlementAmount").value > totalDeposit) {
+                                document.getElementById("settlementAmountspan1").innerHTML = "Settlement Amount should not greater than Deposit Amount.";
+                                document.getElementById("settlementAmountspan1").style.display = "block";
+                                return false;
+                            } else {
+                                document.getElementById("settlementAmountspan1").innerHTML = "";
+                            }
+
+                            $('#Confirm_Modal').modal({ backdrop: 'static', keyboard: false }, 'show');
+                        }
+
+                        function submitSettlement() {
+
+                            var depositId = sessionStorage.getItem("depositId");
+                            var settlementRemark = document.getElementById("settlementNote").value;
+                            var settlementAmount = document.getElementById("settlementAmount").value;
+                            var settlementData = {
+                                "depositId": depositId,
+                                "settlementAmount": settlementAmount,
+                                "settlementRemark": settlementRemark
+                            }
+
+                            $.ajax({
+                                type: 'PUT',
+                                data: JSON.stringify(settlementData),
+                                contentType: "application/json",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                    Authorization: localStorage.getItem('token') || '',
+                                },
+                                dataType: 'json',
+                                headers: {
+                                    "content-type": "application/json",
+                                    Authorization: localStorage.getItem('token') || ''
+                                },
+                                url: globalUrl + 'pmcId/' + document.getElementById("pmcId").value + '/deposit/settlement',
+                                success: function (result) {
+                                    window.location.reload();
+                                },
+                                error: function (xhr, textStatus, errorThrown) {
+                                    document.getElementById("main-body").innerHTML = " Ooops! something went wrong, please try again later";
+                                    $('#modal_settlement').modal('show');
+                                }
+
+
+                            });
+                        }
+
+                        function validateInput() {
+                            document.getElementById('settlementNotespan1').style.display = "none";
+                            document.getElementById("settlementAmountspan1").style.display = "none";
+                            document.getElementById("addnewNote1").style.display = "none";
+                        }
+
+                        check = function (e, value) {
+                            if (!e.target.validity.valid) {
+                                e.target.value = value.substring(0, value.length - 1);
+                                return false;
+                            }
+                            var idx = value.indexOf('.');
+                            if (idx >= 0) {
+                                if (value.length - idx > 3) {
+                                    e.target.value = value.substring(0, value.length - 1);
+                                    return false;
+                                }
+                            }
+                            return true;
+                        }
+
+                    </script>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+
+
+    <!-- Modal start -->
+
+    <!-- <div id="modal_settlement" class="modal" tabindex="-1" role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header" style="background-color: pink;">
+                        <span class="modal-title"></span>
+                        <button type="button" class="close" data-dismiss="modal" onclick="location.reload()" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <p id="main-body"></p>
+                    </div>
+                    <div class="modal-footer">
+                         <button type="button" class="btn btn-primary">Save changes</button> 
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="location.reload()">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div> -->
+
+    <!-- Confirm Modal-->
+    <div class="modal fade" id="Confirm_Modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel"></h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">Do you want to submit?</div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary btn-rounded" type="button" data-dismiss="modal">Back</button>
+                    <a class="btn btn-blue btn-rounded" onclick="submitSettlement()">Confirm</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <%- include footer.ejs %>
+</body>
+
+</html>

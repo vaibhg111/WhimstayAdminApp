@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Admin- Whimstay Service Fee</title>
+    <style>
+        form {
+            margin: 20px 0;
+        }
+
+        form input,
+        button {
+            padding: 5px;
+        }
+
+        table {
+            width: 70%;
+            margin-bottom: 20px;
+            border-collapse: collapse;
+        }
+
+        table,
+        th,
+        td {
+            border: 1px solid #FC97B9;
+        }
+
+        table th,
+        table td {
+            padding: 10px;
+            text-align: center;
+        }
+
+        .percentBlock {
+            padding: 6px 12px;
+            font-size: 17px;
+            font-weight: 400;
+            line-height: 1;
+            color: #555;
+            text-align: center;
+            background-color: #eee;
+            border: 1px solid #ccc;
+        }
+    </style>
+
+</head>
+
+<body id="page-top">
+    <%- include header.ejs %>
+    <div id="wrapper">
+        <%- include sidenav.ejs %>
+        <div class="container-fluid">
+            <input type="hidden" value="<%= data %>" id="userId">
+            <input type="hidden" id="userProfileId" class="form-control">
+            <div class="container">
+                <br><br>
+                <h6>Define Whimstay Service Fee For Traveller</h6><br />
+                <div class="form-group">
+                    <label>Service Fee Percentage: </label>
+                    <div class="input-group col-sm-4">
+                        <input type="number" class="form-control" id="servicePer" min="0" max="100" step="0.01"
+                            onInput="checkLength()" onkeypress="return check(event,value)" name="servicePer"><span
+                            class="percentBlock"><i class="fas fa-percent"></i></span>
+                    </div>
+                    <span id="servicePer1" style="color:red"></span>
+                    <!-- </div> -->
+                    <div class="checkbox" style="margin-top: 30px;">
+                        <label><input class="chk" type="checkbox" value="0" id="Feature_0"> Pet Fee</label>
+                    </div>
+                    <div class="checkbox">
+                        <label><input class="chk" type="checkbox" value="1" id="Feature_1"> Clean Fee</label>
+                    </div>
+                    <div class="checkbox">
+                        <label><input class="chk" type="checkbox" value="2" id="Feature_2"> Other Fee</label>
+                    </div>
+                    <div class="checkbox">
+                        <label><input class="chk" type="checkbox" value="3" id="Feature_3"> Nightly Fee</label>
+                    </div>
+                    <br>
+                    <div id="addTemplate"><button type="submit" onclick="validate()" id="saveServiceFee"
+                            class="btn btn-blue btn-rounded btn-large width-30">Save</button></div>
+                </div>
+            </div>
+        </div>
+        <script>
+            var baseURL = globalUrl;
+
+            $(document).ready(function () {
+                $.ajax({
+
+                    headers: {
+                        "content-type": "application/json",
+                        Authorization: localStorage.getItem('token') || ''
+                    },
+                    type: "GET",
+                    url: baseURL + 'user/traveler/servicefee',
+                    success: function (result) {
+                        sessionStorage.setItem("servicefeePercentageId", result.servicefeePercentageId);
+                        document.getElementById("servicePer").value = result.servicefeePercentage;
+                        if (result.petfeeApplServicefee == true) {
+                            $('#Feature_0').prop('checked', true);
+                        } else {
+                            $('#Feature_0').prop('checked', false);
+                        }
+
+                        if (result.cleanfeeApplServicefee == true) {
+                            $('#Feature_1').prop('checked', true);
+                        } else {
+                            $('#Feature_1').prop('checked', false);
+                        }
+
+                        if (result.otherfeeApplServicefee == true) {
+                            $('#Feature_2').prop('checked', true);
+                        } else {
+                            $('#Feature_2').prop('checked', false);
+                        }
+
+                        if (result.nightlyrateApplServicefee == true) {
+                            $('#Feature_3').prop('checked', true);
+                        } else {
+                            $('#Feature_3').prop('checked', false);
+                        }
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        console.log('update Stock error: ' + textStatus);
+                    }
+
+                });
+            });
+
+            var point = false;
+            var count = 0;
+            function check(e, value) {
+                var unicode = e.charCode ? e.charCode : e.keyCode;
+
+                if (value == 100) {
+                    return false;
+                }
+
+                var idx = value.indexOf('.');
+                if (idx >= 0 && unicode != 45 && unicode != 46) {
+                    if (value.length - idx > 2) {
+                        e.target.value = value.substring(0, value.length - 1);
+                    }
+                }
+
+                if (idx != -1 && unicode == 46) {
+                    return false;
+                }
+
+                if (unicode == 45 && point == false) {
+                    point = true;
+                }
+                if (unicode != 8) if ((unicode < 48 || unicode > 57) && unicode != 46 && unicode == 45) return false;
+            }
+            function checkLength() {
+                document.getElementById("servicePer1").innerHTML = ""
+                var fieldVal = document.getElementById('servicePer').value;
+                //Suppose u want 3 number of character
+                if (fieldVal <= 100) {
+                    return true;
+                }
+                else {
+                    var str = document.getElementById('servicePer').value;
+                    str = 100;
+                    document.getElementById('servicePer').value = str;
+                }
+            }
+
+            // check = function (e, value) {
+            //     if (!e.target.validity.valid) {
+            //         e.target.value = value.substring(0, value.length - 1);
+            //         return false;
+            //     }
+            //     var idx = value.indexOf('.');
+            //     if (idx >= 0) {
+            //         if (value.length - idx > 3) {
+            //             e.target.value = value.substring(0, value.length - 1);
+            //             return false;
+            //         }
+            //     }
+            //     return true;
+            // }
+
+            function validate() {
+                if (document.getElementById("servicePer").value == "" || document.getElementById("servicePer").value == null || document.getElementById("servicePer").value == undefined) {
+                    document.getElementById("servicePer1").innerHTML = "Please enter service percentage."
+                    return false;
+                } else {
+                    document.getElementById("servicePer1").innerHTML = ""
+                }
+                saveServiceFee();
+            }
+
+            function saveServiceFee() {
+                var servicePer = document.getElementById("servicePer").value;
+                var serviceData = {};
+                var isNightlyrateApplServicefee, isPetfeeApplServicefee, isOtherfeeApplServicefee, isCleanfeeApplServicefee;
+                if ($('#Feature_0').is(":checked")) {
+                    isPetfeeApplServicefee = true;
+                } else {
+                    isPetfeeApplServicefee = false;
+                }
+                if ($('#Feature_1').is(":checked")) {
+                    isCleanfeeApplServicefee = true;
+                } else {
+                    isCleanfeeApplServicefee = false;
+                }
+                if ($('#Feature_2').is(":checked")) {
+                    isOtherfeeApplServicefee = true;
+                } else {
+                    isOtherfeeApplServicefee = false;
+                }
+                if ($('#Feature_3').is(":checked")) {
+                    isNightlyrateApplServicefee = true;
+                } else {
+                    isNightlyrateApplServicefee = false;
+                }
+                var servicefeePercentageId = sessionStorage.getItem("servicefeePercentageId");
+
+                serviceData = {
+                    "active": true,
+                    "servicefeePercentageId" : servicefeePercentageId,
+                    "servicefeePercentage": servicePer,
+                    "petfeeApplServicefee": isPetfeeApplServicefee,
+                    "cleanfeeApplServicefee": isCleanfeeApplServicefee,
+                    "otherfeeApplServicefee": isOtherfeeApplServicefee,
+                    "nightlyrateApplServicefee": isNightlyrateApplServicefee
+                }
+                $.ajax({
+                    type: 'PUT',
+                    data: JSON.stringify(serviceData),
+                    contentType: "application/json",
+                    headers: {
+                        "content-type": "application/json",
+                        Authorization: localStorage.getItem('token') || ''
+                    },
+                    dataType: 'json',
+                    url: baseURL + 'user/traveler/servicefee',
+                    success: function (result) {
+                        // window.location.reload();
+                        document.getElementById("message-body").innerHTML = "Whimstay Service Fee updated successfully.";
+                        $('#Share_model').modal('show');
+                    },
+                    error: function (xhr, textStatus, errorThrown) {
+
+                    }
+                });
+            }
+        </script>
+    </div>
+
+    <!-- Modal start -->
+
+    <div id="Share_model" class="modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header" style="background-color: pink;">
+                    <span class="modal-title"></span>
+                    <button type="button" class="close" data-dismiss="modal" onclick="location.reload()"
+                        aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p id="message-body"></p>
+                </div>
+                <div class="modal-footer">
+                    <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
+                    <button type="button" class="btn btn-secondary" onclick="location.reload()"
+                        data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal End -->
+
+    <%- include footer.ejs %>
+</body>
+
+</html>

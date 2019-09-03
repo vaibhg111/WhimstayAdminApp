@@ -1,0 +1,36 @@
+
+{
+    "development": {
+        "config_id": "development",
+        "app_name": "whimstay",
+        "app_desc": "arbaaz",
+        "api_url":"https://api-dev.wemaste.com/v2/",
+        "host_url":"https://admin-host-dev.wemaste.com/",
+        "node_port": 9002,
+        "mode":"development",
+        "json_indentation": 4
+    },
+    "testing": {
+        "config_id": "testing",
+        "app_name": "whimstay",
+        "app_desc": "arbaaz",
+        "api_url":"https://api-test.wemaste.com/v2/",
+        "host_url":"https://admin-host-test.wemaste.com/",
+        "node_port": 9003,
+        "mode":"testing",
+        "json_indentation": 4
+    },
+    "production": {
+        "config_id": "production",
+        "app_name": "whimstay",
+        "app_desc": "arbaaz",    
+        "api_url":"https://api-staging.whimstay.com/whimstayAPI/v2/",
+        "host_url":"https://admin-host.wemaste.com/",
+        "node_port": 4002,
+        "mode":"production",
+        "json_indentation": 4
+    },
+    "env":{
+        "mode":"production"
+    }
+}

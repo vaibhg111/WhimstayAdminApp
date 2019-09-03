@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Messages</title>
+    <style>
+        form {
+            margin: 20px 0;
+        }
+
+        form input,
+        button {
+            padding: 5px;
+        }
+
+        table {
+            width: 70%;
+            margin-bottom: 20px;
+            border-collapse: collapse;
+        }
+
+        table,
+        th,
+        td {
+            border: 1px solid #FC97B9;
+        }
+
+        table th,
+        table td {
+            padding: 10px;
+            text-align: center;
+        }
+    </style>
+
+</head>
+
+<body id="page-top">
+    <%- include header.ejs %>
+    <div id="wrapper">
+        <%- include sidenav.ejs %>
+        <div id="content-wrapper">
+
+            <div class="container-fluid">
+                <input type="hidden" value="<%= data %>" id="userId">
+                <input type="hidden" id="userProfileId" class="form-control">
+                <div class="container">
+                    <div class="row">
+                        <!-- <div>
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <h6 class="text-blue">Terms and Conditions</h6>
+                                </div>
+                            </div>
+                        </div> -->
+                        <div class="col-md-12 margin-30px-bottom">
+
+                            <div class="container-fluid">
+                                <input type="hidden" value="<%= data %>" id="userId">
+                                <input type="hidden" id="userProfileId" class="form-control">
+                                <div class="container">
+                                    <div id="faqSectionDisplay" style="margin-top:15px;"></div>
+                                </div>
+                            </div>
+                            <script>
+                                var baseURL = "https://api-dev.wemaste.com/";
+                                $(document).ready(function () {
+                                    $('#faqSectionDisplay').append(`<div><h5 class="text-capitalize text-dark-blue font-weight-300 margin-20px-bottom">Messages</h5>
+                                        <div class="form-group"><div class="col-md-3"><label for="workAddress" class="">Type Message Here : </label></div>
+                                        <div class="col-md-9"> 
+      <textarea class="form-control" rows="5" id="comment"></textarea></div>
+                                       
+                                        <button class="btn btn-blue btn-rounded pull-right" type="button" onclick="sendMessage()" style="margin-right: 20px;">Send</button>`);
+                                });
+
+                                function sendMessage() {
+                                    alert("Message  Sent ...........!");
+                                }
+                            </script>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <%- include footer.ejs %>
+</body>
+
+</html>

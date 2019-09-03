@@ -1,0 +1,11 @@
+{"level":"info","message":"Production Environments started successfully","timestamp":"2019-02-28T16:17:38.364Z","service":"user-service"}
+{"level":"info","message":"listening on port 4002","timestamp":"2019-02-28T16:17:38.402Z","service":"user-service"}
+{"level":"info","message":"Production Environments started successfully","timestamp":"2019-02-28T16:18:59.897Z","service":"user-service"}
+{"level":"info","message":"listening on port 4002","timestamp":"2019-02-28T16:18:59.932Z","service":"user-service"}
+{"level":"info","message":"Development Environments started successfully","timestamp":"2019-03-04T05:59:19.875Z","service":"user-service"}
+{"level":"info","message":"listening on port 9002","timestamp":"2019-03-04T05:59:19.948Z","service":"user-service"}
+{"level":"error","message":"userId not found","service":"user-service"}
+{"level":"error","message":"userId not found","service":"user-service"}
+{"level":"info","message":"signIn successfull","are":"passed along","service":"user-service"}
+{"level":"info","message":"SignOut Successfull","service":"user-service"}
+{"level":"error","message":"userId not found","service":"user-service"}

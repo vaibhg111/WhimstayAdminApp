@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Admin-Booking Refund</title>
+    <style>
+        form input,
+        button {
+            padding: 5px;
+        }
+
+        table {
+            width: 100%;
+            margin-bottom: 20px;
+            border-collapse: collapse;
+        }
+
+        table,
+        th,
+        td {
+            border: 1px solid #FC97B9;
+        }
+
+        table th,
+        table td {
+            /* padding: 10px; */
+            /* text-align: center; */
+            font-family: montserrat;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font: 16px Arial;
+        }
+
+        .autocomplete {
+            /*the container must be positioned relative:*/
+            position: relative;
+            display: inline-block;
+        }
+
+        form {
+            margin-top: 100px;
+        }
+
+        input {
+            border: 1px solid transparent;
+            background-color: #f1f1f1;
+            padding: 10px;
+            font-size: 16px;
+            font-family: montserrat;
+        }
+
+        input[type=text] {
+            background-color: #f1f1f1;
+            width: 100%;
+        }
+
+        input[type=submit] {
+            background-color: DodgerBlue;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        .autocomplete-items {
+            position: absolute;
+            border: 1px solid #d4d4d4;
+            border-bottom: none;
+            border-top: none;
+            z-index: 99;
+            top: 100%;
+            left: 0;
+            right: 0;
+        }
+
+        .autocomplete-items div {
+            padding: 10px;
+            cursor: pointer;
+            background-color: #fff;
+            border-bottom: 1px solid #d4d4d4;
+        }
+
+        .autocomplete-items div:hover {
+            /*when hovering an item:*/
+            background-color: #e9e9e9;
+        }
+
+        .autocomplete-active {
+            /*when navigating through the items using the arrow keys:*/
+            background-color: DodgerBlue !important;
+            color: #ffffff;
+        }
+
+        .dataTables_scrollBody {
+            position: relative;
+            overflow: auto;
+            width: 100%;
+            margin-top: -18px;
+        }
+
+        div.dataTables_wrapper {
+            margin: 0 auto;
+        }
+
+        input[type=number]::-webkit-outer-spin-button,
+        input[type=number]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+            color: white !important;
+            background: linear-gradient(to bottom, #ffffff 0%, rgb(255, 255, 255) 100%);
+            background-color: #ffffff;
+            border: #ffffff;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button {
+            padding: 0px;
+        }
+
+        .page-item.active .page-link {
+            color: #02C6C4;
+            background-color: #ffffff;
+            border-color: #dee2e6;
+        }
+
+        .pagination>li>a {
+            color: #02C6C4;
+        }
+
+        .pagination>li>a,
+        .pagination>li>span {
+            position: relative;
+            float: left;
+            padding: 6px 12px;
+            margin-left: -1px;
+            line-height: 1.42857143;
+            text-decoration: none;
+            background-color: #fff;
+            border: 1px solid #ddd;
+        }
+
+        .page-link {
+            /* position: relative; */
+            display: block;
+            padding: .5rem .75rem;
+            /* margin-left: -1px; */
+            line-height: 1.25;
+            color: #007bff;
+            /* background-color: #fff; */
+            border: 1px solid #dee2e6;
+        }
+
+        /* .dataTables_filter, */
+        .dataTables_info,
+        .dataTables_length {
+            display: none;
+        }
+    </style>
+
+</head>
+
+<body id="page-top">
+    <%- include header.ejs %>
+    <div id="wrapper">
+        <%- include sidenav.ejs %>
+        <div id="content-wrapper">
+            <div class="container-fluid">
+                <input type="hidden" value="<%= data %>" id="userId">
+                <input type="hidden" id="userProfileId" class="form-control">
+                <div class="container" id="claimBooking">
+                    <!-- <section id="bookinglist" class="listings no-transition"> -->
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-md-12 margin-20px-top margin-30px-bottom">
+                                <h3 class="text-capitalize text-dark-blue font-weight-300">Booking Refund</h3>
+                            </div>
+                        </div>
+                        <!-- <div class="row">
+                            <div class="col-sm-3">
+                                <input type="text" id="searchBooking" onkeyup="searchBooking()" placeholder="Booking #">
+                            </div>
+                            <div class="col-sm-3">
+                                <input type="text" id="searchName" onkeyup="searchName()" placeholder="Name">
+                            </div>
+                        </div> -->
+                        <div class="row">
+                            <div class="col-md-12 margin-30px-bottom">
+                                <table id="bookingrefund_table" class="table table-striped table-bordered" style="width: 100%">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col" style="width: 88px;">Status</th>
+                                            <th>Date</th>
+                                            <th scope="col" style="width: 88px;">Booking #</th>
+                                            <th> Guest</th>
+                                            <th scope="col" style="width: 88px;">Itinerary</th>
+                                            <th>Address</th>
+                                            <th class="text-right" scope="col" style="width: 120px;">Total</th>
+                                            <th class="text-right" scope="col" style="width: 120px;">Refund</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- </section> -->
+                    <script>
+                        var tablelength;
+                        var itemDataArray = [];
+
+                        $(document).ready(function () {
+                            var userId = document.getElementById("userId").value;
+                            $.ajax({
+                                url: globalUrl + 'v1/user/' + userId + '/booking/admin/refund',
+                                type: 'GET',
+                                headers: {
+                                    "content-type": "application/json",
+                                    Authorization: localStorage.getItem('token') || ''
+                                },
+                                dataType: 'json',
+                                success: function (result, textStatus, xhr) {
+                                    // log("custom log: " + JSON.stringify(result));
+                                    var checkinDt;
+                                    var address;
+                                    var guestName;
+                                    var nextCheckout;
+                                    var cnt = 0;
+                                    var totalDeposit;
+                                    tablelength = result.length;
+                                    var status; var guestname;
+
+                                    var refund = "";
+
+                                    $.each(result, function (i, item) {
+
+                                        if (item.status == null || item.status == undefined) {
+                                            status = ""
+                                        } else {
+                                            status = item.status;
+                                        }
+
+                                        if (item.guestName == null || item.guestName == undefined) {
+                                            guestname = ""
+                                        } else {
+                                            guestname = item.guestName;
+                                        }
+
+                                        if (item.refund == null || item.refund == undefined) {
+                                            refund = "";
+                                        } else {
+                                            refund = '$ ' + item.refund.toFixed(2).toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,");
+                                        }
+
+                                        if (item.totalDeposit == null || item.totalDeposit == undefined) {
+                                            totalDeposit = "";
+                                        } else {
+                                            totalDeposit = '$ ' + item.totalDeposit.toFixed(2).toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,");
+                                        }
+
+                                        var refundDate = moment(item.refundDate).format('MMM DD YYYY');
+                                        if (item.status == "Submit for Refund") {
+                                            $('<tr>').html('<td scope="row">' + item.status + '</td><td>' + refundDate + '</td><td>' + item.bookingNo + '</td><td>' + guestname + '</td><td>' + item.itinerary + '</td><td>' + item.address + '</td><td class="text-right">' + totalDeposit + '</td><td class="text-right">' + refund + '</td><td><button class="btn btn-blue btn-rounded width-100" id="' + item.bookingId + '" onclick="viewBooking(this)">View</button></td>').appendTo('#bookingrefund_table');
+                                        } else {
+                                            $('<tr>').html('<td scope="row">' + item.status + '</td><td>' + refundDate + '</td><td>' + item.bookingNo + '</td><td>' + guestname + '</td><td>' + item.itinerary + '</td><td>' + item.address + '</td><td class="text-right">' + totalDeposit + '</td><td class="text-right">' + refund + '</td><td><button class="btn btn-blue btn-rounded width-100" id="' + item.bookingId + '" onclick="refundBooking(this)">Refund</button></td>').appendTo('#bookingrefund_table');
+                                        }
+                                    });
+                                    $('#bookingrefund_table').DataTable({
+                                        "scrollX": true,
+                                        "ordering":false,
+                                        "paging": true,
+                                        "searching": true,
+                                        "scrollCollapse": true
+                                    });
+                                },
+                                error: function (xhr, textStatus, errorThrown) {
+                                    console.log('Error in Database');
+                                    // console.log(errorThrown);
+                                }
+                            });
+                        });
+
+                        function viewBooking(data) {
+                            sessionStorage.setItem('bookingId', data.id);
+                            window.location.href = '/booking';
+                        }
+
+                        function refundBooking(data) {
+                            sessionStorage.setItem('bookingId', data.id);
+                            window.location.href = '/booking';
+                        }
+
+                        function searchName() {
+                            var input, filter, table, tr, td, i, txtValue;
+                            input = document.getElementById("searchName");
+                            filter = input.value.toUpperCase();
+                            table = document.getElementById("bookingrefund_table");
+                            tr = table.getElementsByTagName("tr");
+                            for (i = 0; i < tr.length; i++) {
+                                td = tr[i].getElementsByTagName("td")[3]; if (td) {
+                                    txtValue = td.textContent || td.innerText; if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                                        tr[i].style.display = "";
+                                    } else {
+                                        tr[i].style.display = "none";
+                                    }
+                                }
+                            }
+                        }
+
+                        function searchBooking() {
+                            var input, filter, table, tr, td, i, txtValue;
+                            input = document.getElementById("searchBooking");
+                            filter = input.value.toUpperCase();
+                            table = document.getElementById("bookingrefund_table");
+                            tr = table.getElementsByTagName("tr");
+                            for (i = 0; i < tr.length; i++) {
+                                td = tr[i].getElementsByTagName("td")[2]; if (td) {
+                                    txtValue = td.textContent || td.innerText; if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                                        tr[i].style.display = "";
+                                    } else {
+                                        tr[i].style.display = "none";
+                                    }
+                                }
+                            }
+                        }
+                    </script>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <%- include footer.ejs %>
+</body>
+
+</html>

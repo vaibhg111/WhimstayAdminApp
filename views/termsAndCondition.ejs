@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Admin-Terms and Conditions</title>
+    <style>
+        form {
+            margin: 20px 0;
+        }
+
+        form input,
+        button {
+            padding: 5px;
+        }
+
+        table {
+            width: 70%;
+            margin-bottom: 20px;
+            border-collapse: collapse;
+        }
+
+        table,
+        th,
+        td {
+            border: 1px solid #FC97B9;
+        }
+
+        table th,
+        table td {
+            padding: 10px;
+            text-align: center;
+        }
+    </style>
+
+</head>
+
+<body id="page-top">
+    <%- include header.ejs %>
+    <div id="wrapper">
+        <%- include sidenav.ejs %>
+        <div id="content-wrapper">
+
+            <div class="container-fluid">
+                <input type="hidden" value="<%= data %>" id="userId">
+                <input type="hidden" id="userProfileId" class="form-control">
+                <div class="container">
+                    <button id="addTnCButton" class="btn btn-blue btn-large btn-rounded"
+                        style="float: right; margin-right: 45px; display: none;" type="button" onclick="addTnC()">ADD
+                        Terms And
+                        Condition</button>
+                    <br> <br> <br>
+                    <div class="row">
+                        <div class="col-md-12 margin-30px-bottom">
+                            <div id="tabs">
+                                <ul class="nav nav-tabs">
+                                    <!-- <li class="nav-item">
+                                        <a class="nav-link" data-toggle="tab" href="#tabhost" id="hostTabApi" onclick="TnChostTabApi()">Host
+                                            Terms & Conditions</a>
+                                    </li>
+
+                                    <li class="nav-item">
+                                        <a class="nav-link" data-toggle="tab" href="#tabtraveller" id="travellerTabApi"
+                                            onclick="TnCtravellerTabApi()">Traveller Terms & Conditions</a>
+                                    </li> -->
+                                    <li class="nav-item">
+                                        <a class="nav-link" data-toggle="tab" href="#tabfaq" id="TnCTabApi"
+                                            onclick="getTnC()">Terms
+                                            & Conditions</a>
+                                    </li>
+                                    <!-- <li class="nav-item">
+                                        <a class="nav-link" data-toggle="tab" href="#tabprivacy" id="TnCPrivacy"
+                                            onclick="getPrivacy()">Terms Privacy</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" data-toggle="tab" href="#tabprivacy" id="TnCPrivacy"
+                                            onclick="getCancellationPrivacy()">Cancellation Privacy</a>
+                                    </li> -->
+                                </ul>
+                            </div>
+
+                            <div class="container-fluid">
+                                <input type="hidden" value="<%= data %>" id="userId">
+                                <input type="hidden" id="userProfileId" class="form-control">
+                                <div class="container">
+                                    <div id="addtncSection" style="display:none">Terms And Conditions: </div>
+                                    <div id="tncSectionDisplay" maxlength="36000" name="tncSectionDisplay"
+                                        style="display: none;"></div>
+                                    <div contenteditable="true" id="hosttncSectionDisplay" maxlength="36000"
+                                        name="hosttncSectionDisplay" style="display: none;"></div>
+                                    <div contenteditable="true" id="travellertncSectionDisplay" maxlength="36000"
+                                        name="travellertncSectionDisplay" style="display: none;"></div>
+                                    <div contenteditable="true" id="privacySectionDisplay" maxlength="36000"
+                                        name="privacySectionDisplay" style="display: none;"></div>
+                                    <div contenteditable="true" id="cancelSectionDisplay" maxlength="36000"
+                                        name="cancelSectionDisplay" style="display: none;"></div>
+                                    <div contenteditable="true" id="addtncSectionDisplay" maxlength="36000"
+                                        name="tncSectionDisplay"></div>
+                                    <div class="" id="tncaddtextarea"></div>
+                                    <div class="pull-right" id="tncSave" style="display: none;"></div>
+
+                                </div>
+                            </div>
+                            <script>
+                                var baseURL = globalUrl;
+                                var latestID, latestI;
+
+                                $(document).ready(function () {
+                                    $('#TnCTabApi').trigger('click');
+                                });
+
+                                // function getCancellationPrivacy() {
+                                //     $('#tncSave').empty();
+                                //     document.getElementById('addtncSectionDisplay').style.display = "none";
+                                //     document.getElementById('tncSave').style.display = "block";
+                                //     document.getElementById('tncSectionDisplay').style.display = "none";
+                                //     document.getElementById('privacySectionDisplay').style.display = "none";
+                                //     document.getElementById('cancelSectionDisplay').style.display = "block";
+                                //     document.getElementById('hosttncSectionDisplay').style.display = "none";
+                                //     document.getElementById('travellertncSectionDisplay').style.display = "none";
+                                //     $.ajax({
+                                //         type: "GET",
+                                //         contentType: "application/json",
+                                //         headers: { "Content-Type": "application/json" },
+
+                                //         url: baseURL + 'v1/users/' + document.getElementById("userId").value + '/termscondition/termstype/0',
+                                //         success: function (result) {
+                                //             if (result.length == 0) {
+
+                                //             } else {
+                                //                 document.getElementById('tncSave').style.display = "block";
+                                //                 document.getElementById('addTnCButton').style.display = "none"
+                                //                 result.forEach(element => {
+                                //                     document.getElementById("cancelSectionDisplay").innerHTML = element.cancellationPrivacy;
+                                //                     sessionStorage.setItem("TnCId", element.termsId);
+                                //                 });
+                                //             }
+                                //         },
+                                //         error: function (jqXHR, textStatus, errorThrown) {
+
+                                //         }
+
+                                //     });
+                                //     $('#tncSave').append('<button class="btn btn-large btn-rounded btn-blue" onclick="editTnc()">Save</button> <button class="btn btn-large btn-rounded btn-blue" onclick="deleteTnc()">Delete</button>');
+                                // }
+
+                                // function getPrivacy() {
+                                //     $('#tncSave').empty();
+                                //     document.getElementById('addtncSectionDisplay').style.display = "none";
+                                //     document.getElementById('tncSave').style.display = "block";
+                                //     document.getElementById('tncSectionDisplay').style.display = "none";
+                                //     document.getElementById('privacySectionDisplay').style.display = "block";
+                                //     document.getElementById('cancelSectionDisplay').style.display = "none";
+                                //     document.getElementById('hosttncSectionDisplay').style.display = "none";
+                                //     document.getElementById('travellertncSectionDisplay').style.display = "none";
+                                //     $.ajax({
+                                //         type: "GET",
+                                //         contentType: "application/json",
+                                //         headers: { "Content-Type": "application/json" },
+
+                                //         url: baseURL + 'v1/users/' + document.getElementById("userId").value + '/termscondition/termstype/0',
+                                //         success: function (result) {
+                                //             if (result.length == 0) {
+
+                                //             } else {
+                                //                 document.getElementById('tncSave').style.display = "block";
+                                //                 document.getElementById('addTnCButton').style.display = "none"
+                                //                 result.forEach(element => {
+                                //                     document.getElementById("privacySectionDisplay").innerHTML = element.privacy;
+                                //                     sessionStorage.setItem("TnCId", element.termsId);
+                                //                 });
+                                //             }
+                                //         },
+                                //         error: function (jqXHR, textStatus, errorThrown) {
+
+                                //         }
+
+                                //     });
+                                //     $('#tncSave').append('<button class="btn btn-large btn-rounded btn-blue" onclick="editTnc()">Save</button> <button class="btn btn-large btn-rounded btn-blue" onclick="deleteTnc()">Delete</button>');
+                                // }
+
+                                function TnChostTabApi() {
+                                    $('#tncSave').empty();
+                                    document.getElementById('addtncSectionDisplay').style.display = "none";
+                                    document.getElementById('tncSave').style.display = "none";
+                                    document.getElementById('tncSectionDisplay').style.display = "none";
+                                    document.getElementById('privacySectionDisplay').style.display = "none";
+                                    document.getElementById('cancelSectionDisplay').style.display = "none";
+                                    document.getElementById('travellertncSectionDisplay').style.display = "none";
+                                    document.getElementById('hosttncSectionDisplay').style.display = "block";
+                                    $.ajax({
+                                        type: "GET",
+                                        contentType: "application/json",
+                                        headers: {
+                                            "content-type": "application/json",
+                                            Authorization: localStorage.getItem('token') || ''
+                                        },
+
+                                        url: baseURL + 'termsAndConditions/termstype/1',
+                                        success: function (result) {
+                                            if (result.length == 0) {
+                                                document.getElementById('addTnCButton').style.display = "block";
+                                            } else {
+                                                document.getElementById('addTnCButton').style.display = "none";
+                                                result.forEach(element => {
+                                                    document.getElementById('tncSave').style.display = "block";
+                                                    document.getElementById("hosttncSectionDisplay").innerHTML = element.termsText;
+                                                });
+                                            }
+                                        },
+                                        error: function (jqXHR, textStatus, errorThrown) {
+
+                                        }
+
+                                    });
+                                    $('#tncSave').append('<button class="btn btn-large btn-rounded btn-blue" onclick="editTnc()">Save</button> <button class="btn btn-large btn-rounded btn-blue" onclick="deleteTnc()">Delete</button>');
+                                }
+
+                                function TnCtravellerTabApi() {
+                                    $('#tncSave').empty();
+                                    document.getElementById('addtncSectionDisplay').style.display = "none";
+                                    document.getElementById('tncSave').style.display = "none";
+                                    document.getElementById('tncSectionDisplay').style.display = "none";
+                                    document.getElementById('privacySectionDisplay').style.display = "none";
+                                    document.getElementById('cancelSectionDisplay').style.display = "none";
+                                    document.getElementById('hosttncSectionDisplay').style.display = "none";
+                                    document.getElementById('travellertncSectionDisplay').style.display = "block";
+                                    $.ajax({
+                                        type: "GET",
+                                        contentType: "application/json",
+                                        headers: {
+                                            "content-type": "application/json",
+                                            Authorization: localStorage.getItem('token') || ''
+                                        },
+
+                                        url: baseURL + 'termsAndConditions/termstype/2',
+                                        success: function (result) {
+                                            if (result.length == 0) {
+                                                document.getElementById('addTnCButton').style.display = "block";
+                                            } else {
+                                                document.getElementById('tncSave').style.display = "block";
+                                                document.getElementById('addTnCButton').style.display = "none"
+                                                result.forEach(element => {
+                                                    document.getElementById("travellertncSectionDisplay").innerHTML = element.termsText;
+                                                });
+                                            }
+                                        },
+                                        error: function (jqXHR, textStatus, errorThrown) {
+
+                                        }
+
+                                    });
+                                    $('#tncSave').append('<button class="btn btn-large btn-rounded btn-blue" onclick="editTnc()">Save</button> <button class="btn btn-large btn-rounded btn-blue" onclick="deleteTnc()">Delete</button>');
+                                }
+
+                                function getTnC() {
+                                    $('#tncSave').empty();
+                                    document.getElementById('addtncSectionDisplay').style.display = "none";
+                                    document.getElementById('tncSave').style.display = "none";
+                                    document.getElementById('tncSectionDisplay').style.display = "block";
+                                    document.getElementById('privacySectionDisplay').style.display = "none";
+                                    document.getElementById('cancelSectionDisplay').style.display = "none";
+                                    document.getElementById('hosttncSectionDisplay').style.display = "none";
+                                    document.getElementById('travellertncSectionDisplay').style.display = "none";
+                                    $.ajax({
+                                        type: "GET",
+                                        contentType: "application/json",
+                                        headers: {
+                                            "content-type": "application/json",
+                                            Authorization: localStorage.getItem('token') || ''
+                                        },
+
+                                        url: baseURL + 'termsAndConditions/termstype/0',
+                                        success: function (result) {
+                                            var cnt = 0;
+                                            if (result.length == 0) {
+                                                document.getElementById('addTnCButton').style.display = "block";
+                                            } else {
+                                                document.getElementById('tncSave').style.display = "block";
+                                                document.getElementById('addTnCButton').style.display = "none";
+                                                latestI = (result.length - 1);
+                                                latestID = result[latestI].termsId;
+                                                sessionStorage.setItem("TnCId", latestID);
+                                                $('#tncSectionDisplay').append(
+                                                    '<div id="tncSection' + cnt + '"class="card-header panel-heading tncSection' + cnt + '" data-toggle="collapse" data-target="#tncToggle' + cnt + '" style="font-weight:bold;margin-top: 20px;"><i id="' + result[latestI].termsId + '<i id="tncIconId' + cnt + '"class="fas fa-plus pull-right" style="margin-right:10px;"></i>Terms of Service</div>' +
+                                                    '<div id="tncToggle' + cnt + '" class="collapse tncText' + cnt + '" style="margin:20px;"><textarea id="termtext" rows="10" cols="50">' + result[latestI].termsText + '</textarea></div></div><br>' +
+                                                    '<div id="tncSection' + cnt + '"class="card-header panel-heading tncSection' + cnt + '" data-toggle="collapse" data-target="#tncPrivacyToggle' + cnt + '" style="font-weight:bold;"><i id="' + result[latestI].termsId + '<i id="tncIconId' + cnt + '"class="fas fa-plus pull-right" style="margin-right:10px;"></i>Privacy Policy</div>' +
+                                                    '<div id="tncPrivacyToggle' + cnt + '" class="collapse tncText' + cnt + '" style="margin:20px;"><textarea id="privacytext" rows="10" cols="50">' + result[latestI].privacy + '</textarea></div></div><br>' +
+                                                    '<div id="tncSection' + cnt + '"class="card-header panel-heading tncSection' + cnt + '" data-toggle="collapse" data-target="#tncCPrivacyToggle' + cnt + '" style="font-weight:bold;"><i id="' + result[latestI].termsId + '<i id="tncIconId' + cnt + '"class="fas fa-plus pull-right" style="margin-right:10px;"></i>Cancellation Policy</div>' +
+                                                    '<div id="tncCPrivacyToggle' + cnt + '" class="collapse tncText' + cnt + '" style="margin:20px;"><textarea id="cPrivacytext" rows="10" cols="50">' + result[latestI].cancellationPrivacy + '</textarea></div></div><br>');
+                                                cnt++;
+                                            }
+                                        },
+                                        error: function (jqXHR, textStatus, errorThrown) {
+
+                                        }
+
+                                    });
+                                    $('#tncSave').append('<button class="btn btn-large btn-rounded btn-blue" onclick="editTnc()">Save</button> <button class="btn btn-large btn-rounded btn-blue" onclick="deleteTnc()">Delete</button>');
+                                }
+
+                                // function toggleIcon(obj) {
+                                //     var element = obj.lastElementChild.id;
+                                //     $("#" + element).toggleClass('fas fa-plus pull-right fas fa-minus pull-right');
+                                // }
+
+                                function addTnC() {
+                                    document.getElementById('addTnCButton').style.display = "none";
+                                    $('#tabs').empty();
+                                    $('#tncSave').empty();
+                                    $('#travellertncSectionDisplay').remove();
+                                    $('#hosttncSectionDisplay').remove();
+                                    $('#tncSectionDisplay').remove();
+                                    $('#privacySectionDisplay').remove();
+                                    $('#cancelSectionDisplay').remove();
+                                    $('#addtncSectionDisplay').remove();
+                                    document.getElementById('tncSave').style.display = "block";
+                                    document.getElementById('addtncSection').style.display = "none";
+                                    $('#tncaddtextarea').append('<div id="tncSection" class="card-header panel-heading tncSection" data-toggle="collapse" data-target="#tncToggle" style="font-weight:bold;margin-top: 20px;">Terms of Service</div>' +
+                                        '<div id="tncToggle" class="collapse tncText" style="margin:20px;"><textarea id="addtermtext" rows="10" cols="50"></textarea></div></div><br>' +
+                                        '<div id="tncSection"class="card-header panel-heading tncSection" data-toggle="collapse" data-target="#tncPrivacyToggle" style="font-weight:bold;">Privacy Policy</div>' +
+                                        '<div id="tncPrivacyToggle" class="collapse tncText" style="margin:20px;"><textarea id="addprivacytext" rows="10" cols="50"></textarea></div></div><br>' +
+                                        '<div id="tncSection"class="card-header panel-heading tncSection" data-toggle="collapse" data-target="#tncCPrivacyToggle" style="font-weight:bold;">Cancellation Policy</div>' +
+                                        '<div id="tncCPrivacyToggle" class="collapse tncText" style="margin:20px;"><textarea id="addcPrivacytext" rows="10" cols="50"></textarea></div></div><br>');
+                                    $('#tncSave').append('<button class="btn btn-blue btn-rounded pull-right" type="button" onclick="submitTnC()">Submit</button><button class="btn btn-blue btn-rounded pull-right" type="button" onclick="backTnc()" style="margin-right: 20px;">Back</button>');
+                                }
+
+                                function deleteTnc() {
+                                    var tnC_id = sessionStorage.getItem("TnCId");
+                                    $.ajax({
+                                        url: baseURL + 'termsAndConditions/termsId/' + tnC_id,
+                                        type: 'DELETE',
+                                        headers: {
+                                            "content-type": "application/json",
+                                            Authorization: localStorage.getItem('token') || ''
+                                        },
+                                        dataType: 'json',
+                                        success: function (result, textStatus, xhr) {
+                                            window.location.reload();
+                                        }, error: function (xhr, textStatus, errorThrown) {
+                                            console.log('Update Stock error');
+                                            // console.log(errorThrown);
+                                        }
+                                    }); baseURL + 'v1/users/' + document.getElementById("userId").value + '/termscondition/' + tnC_id
+                                }
+
+                                function editTnc() {
+                                    var tnC_id = sessionStorage.getItem("TnCId");
+                                    var cancellationPrivacy = document.getElementById('cPrivacytext').value;
+                                    var editPrivacy = document.getElementById('privacytext').value;
+                                    var editTncData = document.getElementById("termtext").value;
+                                    var edittnCData = {
+                                        "privacy": editPrivacy,
+                                        "termsText": editTncData,
+                                        "cancellationPrivacy": cancellationPrivacy,
+                                        "termsId": tnC_id,
+                                        "termsType": 0,
+                                        "active": true
+                                    }
+                                    $.ajax({
+                                        type: 'PUT',
+                                        data: JSON.stringify(edittnCData),
+                                        contentType: "application/json",
+                                        headers: {
+                                            "Content-Type": "application/json",
+                                            Authorization: localStorage.getItem('token') || '',
+                                        },
+                                        dataType: 'json',
+                                        url: baseURL + 'termsAndConditions',
+                                        success: function (result) {
+                                            window.location.reload();
+                                        },
+                                        error: function (xhr, textStatus, errorThrown) {
+
+                                        }
+                                    });
+                                }
+
+                                function submitTnC() {
+                                    var addtermtext = document.getElementById("addtermtext").value;
+                                    var addprivacytext = document.getElementById("addprivacytext").value;
+                                    var addcPrivacytext = document.getElementById("addcPrivacytext").value;
+                                    var tncList = {
+                                        "privacy": addprivacytext,
+                                        "termsText": addtermtext,
+                                        "cancellationPrivacy": addcPrivacytext,
+                                        "termsType": 0,
+                                        "active": true
+                                    }
+                                    $.ajax({
+                                        type: "POST",
+                                        contentType: "application/json",
+                                        dataType: 'json',
+                                        headers: {
+                                            "content-type": "application/json",
+                                            Authorization: localStorage.getItem('token') || ''
+                                        },
+                                        data: JSON.stringify(tncList),
+
+                                        url: baseURL + 'termsAndConditions',
+                                        success: function (result) {
+                                            window.location.reload();
+                                        },
+                                        error: function (jqXHR, textStatus, errorThrown) {
+
+                                        }
+
+                                    });
+                                }
+
+                                function backTnc() {
+                                    window.location.reload();
+                                } 
+                            </script>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <%- include footer.ejs %>
+</body>
+
+</html>

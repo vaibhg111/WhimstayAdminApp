@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Admin-Welcome</title>
+    <style>
+        form {
+            margin: 20px 0;
+        }
+
+        form input,
+        button {
+            padding: 5px;
+        }
+
+        table {
+            width: 70%;
+            margin-bottom: 20px;
+            border-collapse: collapse;
+        }
+
+        table,
+        th,
+        td {
+            border: 1px solid #FC97B9;
+        }
+
+        table th,
+        table td {
+            padding: 10px;
+            text-align: center;
+        }
+    </style>
+
+</head>
+
+<body id="page-top">
+    <%- include header.ejs %>
+    <div id="wrapper">
+        <%- include sidenav.ejs %>
+        <div id="content-wrapper">
+
+            <div class="container-fluid">
+                <input type="hidden" value="<%= data %>" id="userId">
+                <input type="hidden" id="userProfileId" class="form-control">
+                <div class="container">
+                    <button id="addWelcomeButton" class="btn btn-blue btn-large btn-rounded"
+                        style="float: right; margin-right: 45px; display: none" type="button" onclick="addWelcome()">ADD
+                        Welcome
+                        Note</button>
+                    <br> <br> <br>
+                    <div class="row">
+                        <div class="col-md-12 margin-30px-bottom">
+
+                            <div class="container-fluid">
+                                <input type="hidden" value="<%= data %>" id="userId">
+                                <input type="hidden" id="userProfileId" class="form-control">
+                                <div class="container">
+                                    <div id="addWelcome" style="display:none">Welcome: </div>
+                                    <div id="addWelcome1"></div>
+                                    <div id="welcomePage" maxlength="36000" name="welcomePage"></div>
+                                    <div id="saveWelcome"></div>
+                                </div>
+                            </div>
+                            <script>
+                                var baseURL = globalUrl;
+                                var latestID, latestI;
+
+                                $(document).ready(function () {
+                                    $.ajax({
+                                        type: "GET",
+                                        contentType: "application/json",
+                                        headers: {
+                                            "content-type": "application/json",
+                                            Authorization: localStorage.getItem('token') || ''
+                                        },
+
+                                        url: baseURL + 'v1/user/' + document.getElementById("userId").value + '/support/MsysWelcomeNote',
+                                        success: function (result) {
+                                            if (result.length == 0) {
+                                                document.getElementById('addWelcomeButton').style.display = "block";
+                                            } else {
+                                                document.getElementById('addWelcomeButton').style.display = "none";
+                                                latestI = (result.length - 1);
+                                                latestID = result[latestI].noteId;
+                                                document.getElementById("welcomePage").innerHTML = result[latestI].welcomeNote;
+                                                $("#saveWelcome").append('<br><br> <button class="btn btn-blue btn-rounded pull-right" type="button" onclick="editWelcome()">Edit</button>');
+                                            }
+                                        },
+                                        error: function (jqXHR, textStatus, errorThrown) {
+
+                                        }
+
+                                    });
+                                });
+
+                                function addWelcome() {
+                                    $('#welcomePage').empty();
+                                    document.getElementById('addWelcome').style.display = "block";
+                                    $('#addWelcome1').append('<textarea rows="15" cols="10" id="addWelcometext"></textarea> <button class="btn btn-blue btn-rounded pull-right" type="button" onclick="submitWelcome()">Submit</button><button class="btn btn-blue btn-rounded pull-right" type="button" onclick="backWelcome()" style="margin-right: 20px;">Back</button>');
+                                }
+
+                                function deleteWelcome() {
+                                    // var tnC_id = sessionStorage.getItem("TnCId");
+                                    // $.ajax({
+                                    //     url: baseURL + 'v1/users/' + document.getElementById("userId").value + '/termscondition/' + tnC_id,
+                                    //     type: 'DELETE',
+                                    //     dataType: 'json',
+                                    //     success: function (result, textStatus, xhr) {
+                                    //         window.location.reload();
+                                    //     }, error: function (xhr, textStatus, errorThrown) {
+                                    //         console.log('Update Stock error');
+                                    //         // console.log(errorThrown);
+                                    //     }
+                                    // });
+                                }
+
+                                function editWelcome() {
+                                    $('#saveWelcome').empty();
+                                    var welcomeText = document.getElementById("welcomePage").innerText;
+                                    $('#welcomePage').empty();
+                                    document.getElementById('addWelcome').style.display = "none";
+                                    $('#addWelcome1').append('<textarea rows="15" cols="10" id="editWelcometext"></textarea> <button class="btn btn-blue btn-rounded pull-right" type="button" onclick="saveWelcome()">Save</button><button class="btn btn-blue btn-rounded pull-right" type="button" onclick="backWelcome()" style="margin-right: 20px;">Back</button>');
+                                    document.getElementById('editWelcometext').innerHTML = welcomeText;
+                                }
+
+                                function saveWelcome() {
+                                    var editWelcomeData = document.getElementById("editWelcometext").value;
+                                    var editWelcomeList = {
+                                        "noteId": latestID,
+                                        "welcomeNote": editWelcomeData,
+                                        "active": "1"
+                                    }
+                                    $.ajax({
+                                        type: 'PUT',
+                                        data: JSON.stringify(editWelcomeList),
+                                        contentType: "application/json",
+                                        headers: {
+                                            "content-type": "application/json",
+                                            Authorization: localStorage.getItem('token') || ''
+                                        },
+                                        dataType: 'json',
+                                        url: baseURL + 'v1/user/' + document.getElementById("userId").value + '/support/MsysWelcomeNote',
+                                        success: function (result) {
+                                            window.location.reload();
+                                        },
+                                        error: function (xhr, textStatus, errorThrown) {
+
+                                        }
+                                    });
+                                }
+
+                                function submitWelcome() {
+                                    var welcomeArea = document.getElementById("addWelcometext").value;
+                                    var welcomeList = {
+                                        "welcomeNote": welcomeArea,
+                                        "active": "1"
+
+                                    }
+                                    $.ajax({
+                                        type: "POST",
+                                        contentType: "application/json",
+                                        dataType: 'json',
+                                        headers: {
+                                            "content-type": "application/json",
+                                            Authorization: localStorage.getItem('token') || ''
+                                        },
+                                        data: JSON.stringify(welcomeList),
+
+                                        url: baseURL + 'v1/user/' + document.getElementById("userId").value + '/support/MsysWelcomeNote',
+                                        success: function (result) {
+                                            window.location.reload();
+                                        },
+                                        error: function (jqXHR, textStatus, errorThrown) {
+
+                                        }
+
+                                    });
+                                }
+
+                                function backWelcome() {
+                                    window.location.reload();
+                                } 
+                            </script>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <%- include footer.ejs %>
+</body>
+
+</html>

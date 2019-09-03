@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <title>Admin-FAQ</title>
+    <style>
+        .fa {
+            position: absolute;
+            top: -14px;
+            padding: 5px;
+            right: 656px;
+            cursor: pointer;
+            border-radius: 50%;
+        }
+
+        .panel-heading {
+            cursor: pointer;
+        }
+
+        input[type="radio"] {
+            margin-right: 5px;
+        }
+    </style>
+
+</head>
+
+<body id="page-top">
+    <%- include header.ejs %>
+    <div id="wrapper">
+        <%- include sidenav.ejs %>
+        <div id="content-wrapper">
+            <button class="btn btn-blue btn-large btn-rounded" style="float: right; margin-right: 45px;" type="button"
+                onclick="addFAQ()">ADD FAQ</button>
+
+            <br> <br> <br>
+            <div class="row">
+
+
+                <div class="col-md-12 margin-30px-bottom">
+                    <div id="tabs">
+                        <ul class="nav nav-tabs">
+                            <!-- <li class="nav-item">
+                                <a class="nav-link" data-toggle="tab" href="#tabhost" id="hostTabApi"
+                                    onclick="hostTabApi()">Host
+                                    FAQ</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link" data-toggle="tab" href="#tabtraveller" id="travellerTabApi"
+                                    onclick="travellerTabApi()">Traveller
+                                    FAQ</a>
+                            </li> -->
+                            <li class="nav-item">
+                                <a class="nav-link" data-toggle="tab" href="#tabfaq" id="faqTabApi"
+                                    onclick="getFAQ()">FAQ</a>
+                            </li>
+
+                        </ul>
+                    </div>
+
+                    <div class="container-fluid">
+                        <input type="hidden" value="<%= data %>" id="userId">
+                        <input type="hidden" id="userProfileId" class="form-control">
+                        <div class="container">
+                            <div id="faqSectionDisplay" style="margin-top:15px;"></div>
+                            <span id="faqErrDisplay" style="color: red;"></span>
+                        </div>
+                    </div>
+                    <script>
+                        var baseURL = globalUrl;
+
+                        $(document).ready(function () {
+                            $('#faqTabApi').trigger('click');
+                        });
+
+                        // function hostTabApi() {
+                        //     $('#faqSectionDisplay').empty();
+                        //     $.ajax({
+                        //         type: "GET",
+                        //         contentType: "application/json",
+                        //         headers: {
+                        //             "content-type": "application/json",
+                        //             Authorization: localStorage.getItem('token') || ''
+                        //         },
+
+                        //         url: baseURL + 'v1/users/' + document.getElementById("userId").value + '/faq/faqtype/1',
+                        //         success: function (result) {
+                        //             var cnt = 0;
+                        //             result.forEach(element => {
+                        //                 $('#faqSectionDisplay').append('<div class="panel panel-info col-sm-12">' +
+                        //                     '<div id="faqSection' + cnt + '"class="card-header panel-heading faqSection' + cnt + '" data-toggle="collapse" data-target="#faqToggle' + cnt + '" onclick="toggleIcon(this);" style="font-weight:bold;"><i id="' + element.faqId + '"href="#" data-toggle="modal" data-target="#deleteModal" onclick="deleteFAQ1(this)" class="fas fa-trash-alt pull-right"></i><i id="' + element.faqId + "," + element.faqSection + "," + element.faqText + "," + element.faqType + '" class="fas fa-edit pull-right" onclick="editFAQ(this)" style="margin-right: 10px;"></i><i id="faqIconId' + cnt + '"class="fas fa-plus pull-right" style="margin-right:10px;"></i>' + element.faqSection + '</div>' +
+                        //                     '<div id="faqToggle' + cnt + '" class="collapse faqText' + cnt + '" style="margin:20px;word-wrap: break-word;">' + element.faqText + '</div></div><br>');
+                        //                 cnt++;
+                        //             });
+                        //         },
+                        //         error: function (jqXHR, textStatus, errorThrown) {
+
+                        //         }
+
+                        //     });
+                        // }
+
+                        // function travellerTabApi() {
+                        //     $('#faqSectionDisplay').empty();
+                        //     $.ajax({
+                        //         type: "GET",
+                        //         contentType: "application/json",
+                        //         headers: {
+                        //             "content-type": "application/json",
+                        //             Authorization: localStorage.getItem('token') || ''
+                        //         },
+
+                        //         url: baseURL + 'v1/users/' + document.getElementById("userId").value + '/faq/faqtype/2',
+                        //         success: function (result) {
+                        //             var cnt = 0;
+                        //             result.forEach(element => {
+                        //                 $('#faqSectionDisplay').append('<div class="panel panel-info col-sm-12">' +
+                        //                     '<div id="faqSection' + cnt + '"class="card-header panel-heading faqSection' + cnt + '" data-toggle="collapse" data-target="#faqToggle' + cnt + '" onclick="toggleIcon(this);" style="font-weight:bold;"><i id="' + element.faqId + '"href="#" data-toggle="modal" data-target="#deleteModal" onclick="deleteFAQ1(this)" class="fas fa-trash-alt pull-right"></i><i id="' + element.faqId + "," + element.faqSection + "," + element.faqText + "," + element.faqType + '" class="fas fa-edit pull-right" onclick="editFAQ(this)" style="margin-right: 10px;"></i><i id="faqIconId' + cnt + '"class="fas fa-plus pull-right" style="margin-right:10px;"></i>' + element.faqSection + '</div>' +
+                        //                     '<div id="faqToggle' + cnt + '" class="collapse faqText' + cnt + '" style="margin:20px;word-wrap: break-word;">' + element.faqText + '</div></div><br>');
+                        //                 cnt++;
+                        //             });
+                        //         },
+                        //         error: function (jqXHR, textStatus, errorThrown) {
+
+                        //         }
+
+                        //     });
+                        // }
+
+                        function getFAQ() {
+                            $('#faqSectionDisplay').empty();
+                            $.ajax({
+                                type: "GET",
+                                contentType: "application/json",
+                                headers: {
+                                    "content-type": "application/json",
+                                    Authorization: localStorage.getItem('token') || ''
+                                },
+
+                                url: baseURL + 'faq',
+                                success: function (result) {
+                                    var cnt = 0;
+                                    result.forEach(element => {
+                                        $('#faqSectionDisplay').append('<div class="panel panel-info col-sm-12">' +
+                                            '<div id="faqSection' + cnt + '"class="card-header panel-heading faqSection' + cnt + '" data-toggle="collapse" data-target="#faqToggle' + cnt + '" onclick="toggleIcon(this);" style="font-weight:bold;"><i id="' + element.faqId + '"href="#" data-toggle="modal" data-target="#deleteModal" onclick="deleteFAQ1(this)" class="fas fa-trash-alt pull-right"></i><i id="' + element.faqId + "," + element.faqSection + "," + element.faqText + "," + element.faqtype + '" class="fas fa-edit pull-right" onclick="editFAQ(this)" style="margin-right: 10px;"></i><i id="faqIconId' + cnt + '"class="fas fa-plus pull-right" style="margin-right:10px;"></i>' + element.faqSection + '</div>' +
+                                            '<div id="faqToggle' + cnt + '" class="collapse faqText' + cnt + '" style="margin:20px;word-wrap: break-word;">' + element.faqText + '</div></div><br>');
+                                        cnt++;
+                                    });
+                                },
+                                error: function (jqXHR, textStatus, errorThrown) {
+
+                                }
+
+                            });
+                        }
+
+                        function toggleIcon(obj) {
+                            var element = obj.lastElementChild.id;
+                            $("#" + element).toggleClass('fas fa-plus pull-right fas fa-minus pull-right');
+                        }
+
+                        function addFAQ() {
+                            $('#tabs').empty();
+                            $('#faqSectionDisplay').empty();
+                            $('#faqSectionDisplay').append('Ques: <textarea rows="1" cols="20" id="areaQues"></textarea> <br> Ans: <textarea rows="2" cols="20" id="areaAns"></textarea> <br><input type="radio" name="faq" value="1">Host FAQ <input type="radio" name="faq" value="2" style="margin-left: 40px;">Taveller FAQ <input type="radio" name="faq" value="0" style="margin-left: 40px;">Both <br> <button class="btn btn-blue btn-rounded pull-right" type="button" onclick="submitFAQ()">Submit</button><button class="btn btn-blue btn-rounded pull-right" type="button" onclick="backFAQ()" style="margin-right: 20px;">Back</button>');
+                        }
+
+                        function submitFAQ() {
+                            var faqQues = document.getElementById("areaQues").value;
+                            var faqAns = document.getElementById("areaAns").value;
+                            var faqRadio = $('input[name=faq]:checked').val();
+                            if (faqRadio !== undefined) {
+                                document.getElementById("faqErrDisplay").innerHTML = "";
+                            } else {
+                                document.getElementById("faqErrDisplay").innerHTML = "Please select FAQ Type.";
+                                return false;
+                            }
+                            var faqList = {
+                                "faqSection": faqQues,
+                                "faqText": faqAns,
+                                "faqtype": faqRadio,
+                                "active" : true
+                            }
+                            $.ajax({
+                                type: "POST",
+                                contentType: "application/json",
+                                dataType: 'json',
+                                headers: {
+                                    "content-type": "application/json",
+                                    Authorization: localStorage.getItem('token') || ''
+                                },
+                                data: JSON.stringify(faqList),
+
+                                url: baseURL + 'faq',
+                                success: function (result) {
+                                    window.location.reload();
+                                },
+                                error: function (jqXHR, textStatus, errorThrown) {
+
+                                }
+
+                            });
+
+                        }
+                        function deleteFAQ1(obj) {
+                            document.getElementById("faqID").value = obj.id;
+                            $('#deleteModal').modal({ backdrop: 'static', keyboard: false }, 'show');
+                        }
+
+                        function editFAQ(obj) {
+                            $('#tabs').empty();
+                            var element = obj.id;
+                            var faqArr = element.split(",");
+                            sessionStorage.setItem("faqId", faqArr[0]);
+                            sessionStorage.setItem("faqSection", faqArr[1]);
+                            sessionStorage.setItem("faqText", faqArr[2]);
+                            sessionStorage.setItem("faqtype", faqArr[3]);
+                            $('#faqSectionDisplay').empty();
+                            $('#faqSectionDisplay').append('Ques: <textarea rows="1" cols="20" id="editAreaQues">' + sessionStorage.getItem("faqSection") + '</textarea> <br> Ans: <textarea rows="2" cols="20" id="editAreaAns">' + sessionStorage.getItem("faqText") + '</textarea> <br> <input type="radio" name="faq" value="1">Host FAQ <input type="radio" name="faq" value="2" style="margin-left: 40px;">Taveller FAQ <input type="radio" name="faq" value="0" style="margin-left: 40px;">Both <br> <button class="btn btn-blue btn-rounded pull-right" type="button" onclick="saveFAQ()">Save</button><button class="btn btn-blue btn-rounded pull-right" type="button" onclick="backFAQ()" style="margin-right: 20px;">Back</button>');
+                            $('input[name=faq][value="' + faqArr[3] + '"]').prop('checked', true);
+                        }
+                        function backFAQ() {
+                            window.location.reload();
+                        }
+                        function saveFAQ() {
+                            var editAreaQues = document.getElementById("editAreaQues").value;
+                            var editAreaAns = document.getElementById("editAreaAns").value;
+                            var faqRadio = $('input[name=faq]:checked').val();
+                            var faqID = sessionStorage.getItem("faqId");
+                            var editfaqData = {
+                                "faqSection": editAreaQues,
+                                "faqText": editAreaAns,
+                                "faqtype": faqRadio,
+                                "faqId" : faqID,
+                                "active": true
+                            }
+                            $.ajax({
+                                type: 'PUT',
+                                data: JSON.stringify(editfaqData),
+                                contentType: "application/json",
+                                headers: {
+                                    "content-type": "application/json",
+                                    Authorization: localStorage.getItem('token') || ''
+                                },
+                                dataType: 'json',
+                                headers: {
+                                    "Content-Type": "application/json",
+                                    Authorization: localStorage.getItem('token') || '',
+                                },
+                                url: baseURL + 'faq',
+                                success: function (result) {
+                                    window.location.reload();
+                                },
+                                error: function (xhr, textStatus, errorThrown) {
+
+                                }
+                            });
+                        }
+                    </script>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Delete Modal -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Ready to Delete?</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">Are you sure to delete your FAQ?</div>
+                <input type="hidden" id="faqID">
+                <div class="modal-footer">
+                    <button class="btn btn-secondary btn-rounded" type="button" data-dismiss="modal">Cancel</button>
+                    <button class="btn btn-blue btn-rounded" id="deleteFAQ">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $('#deleteFAQ').click(function () {
+            $.ajax({
+                url: baseURL + 'faq/' + document.getElementById("faqID").value,
+                type: 'DELETE',
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: localStorage.getItem('token') || '',
+                },
+                dataType: 'json',
+                headers: {
+                    "content-type": "application/json",
+                    Authorization: localStorage.getItem('token') || ''
+                },
+                success: function (result, textStatus, xhr) {
+                    window.location.reload();
+                }, error: function (xhr, textStatus, errorThrown) {
+                    console.log('Update Stock error');
+                    // console.log(errorThrown);
+                }
+            });
+        });
+    </script>
+
+    <%- include footer.ejs %>
+</body>
+
+</html>

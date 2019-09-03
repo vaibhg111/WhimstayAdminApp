@@ -1,0 +1,393 @@
+<!doctype html>
+<html class="no-js" lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1" />
+    <meta name="author" content="Whimstay">
+    <!-- title -->
+    <title>Whimstay Host - Why Not? Let's Go! | Book Your Unsold Nights</title>
+    <!-- description -->
+    <link rel="icon" href="../public/images/wemaste-favicon.png">
+    
+    <meta name="description" content="Book exclusive deals on last-minute vacation rentals! Build community by splitting the cost with friends right from the mobile app. Choose from various destinations in Northern California.">
+    <!-- keywords -->
+    <meta name="keywords" content="last-minute vacation rentals, discount vacation rentals, vacation rentals, renting vacation homes, vacation home rentals, vacation rentals by owner, renting vacation homes, beach house, cabin rental, cottage rental, great rentals, vacation home, vacation homes, vacation rental, renting lodging, discount lodging, holiday homes, villas for rent, cabins for rent, rental cabins, cottages for rent, rent cottages, rent cabins, rent villas, rental villas, condos for rent, condo rentals, pet friendly vacation rentals, accessible vacation rentals, rentals for holidays, weekend vacation rentals">
+    <!-- favicon -->
+    <!-- <link rel="icon" href="../public/images/favicon.ico"> -->
+
+    <!-- styles font-awesome icon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <!-- bootstrap -->
+    <link rel="stylesheet" href="../bootstrap/css/bootstrap.min.css">
+    <!-- animation -->
+    <!-- <link rel="stylesheet" href="css/animate.min.css" /> -->
+    <!-- font-awesome icon -->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css" integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ"
+        crossorigin="anonymous">
+
+    <!-- wemaste styles -->
+    <link rel="stylesheet" href="../public/stylesheets/core.css" />
+    <link rel="stylesheet" href="../public/stylesheets/style.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/parallax.js/1.4.2/parallax.min.js"></script>
+    <script src="../public/javascripts/global.js"></script>
+    <script src="../public/jQuery-Mask/src/jquery.mask.js"></script>
+    <!-- <script src="../public/javascripts/UserAPI.js"></script> -->
+
+
+    <script>
+        function mobileNumber() {
+            var output = document.getElementById("mobile").value;
+            output = output.replace(/\D+/g, '');
+            if (output != "") {
+                document.getElementById("mobileNumber").value = output;
+            }
+        }
+    </script>
+    <style>
+        .modal-body{
+            padding-bottom: 30px;
+        }
+
+        fieldset {
+            border: thin solid #ccc;
+            border-radius: 4px;
+            padding: 20px;
+            padding-left: 40px;
+            background: #fbfbfb;
+        }
+
+        legend {
+            color: #678;
+        }
+
+        .form-control {
+            width: 95%;
+        }
+
+        label small {
+            color: #678 !important;
+        }
+
+        span.req {
+            color: maroon;
+            font-size: 112%;
+        }
+        input[type="checkbox"]{
+
+        width: 15px;
+        height: 19px;
+        margin-top:8px;
+        vertical-align: bottom;
+}
+@media (max-width: 800px){
+section {
+    padding: 100px 0 !important;
+}
+}
+    </style>
+
+
+</head>
+
+<body>
+
+    <!-- start header -->
+    <header>
+        <!-- start navigation -->
+
+
+        <nav class="navbar navbar-default navbar-fixed-top header-light nav-darkblue bg-pink nav-white-text nav_line">
+            <div class="container-fluid nav-header-container">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+
+                    <a href="#home" title="Logo" class="logo scroll navbar-brand">
+                        <img src="../public/images/whimstay-logo.png" class="logo-dark"
+                            alt="boltex">
+                        <img src="../public/images/whimstay-logo.png" alt="boltex" class="logo-light default">
+                    </a>
+                </div>
+                <div class="collapse navbar-collapse pull-right bg-pink" id="myNavbar">
+                    <ul id="accordion" class="nav navbar-nav navbar-left no-margin alt-font text-normal" data-in="fadeIn"
+                        data-out="fadeOut">
+                        <li> <a href="#" class="scroll" data-toggle="modal" data-target="#myModal-Login">Sign In</a>
+                        </li>
+                    </ul>
+
+                    <div class="header-social-icon sm-display-none pull-right margin-20px-top" aria-hidden="true">
+                        <a href="https://facebook.com/wemastevacation" class="facebook-bg-hvr" target="_blank"><i class="fab fa-facebook-f"></i></a>
+                        <a href="https://www.instagram.com/wemaste/" class="instagram-bg-hvr" target="_blank"><i class="fab fa-instagram"></i></a>
+                        <a href="https://linkedin.com/company/wemaste" class="linkedin-bg-hvr" target="_blank"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+
+            </div>
+        </nav>
+
+
+    </header>
+    <!-- end header -->
+
+    <!-- start get started -->
+    <section id="getstarted" class="no-transition">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 margin-30px-top margin-30px-bottom">
+                    <div class="sec-title">
+                        <!-- <div class="text-large text-red margin-10px-bottom font-weight-400 text-blue">Become a Wemasté
+                            Host</div> -->
+                        <h4 class="text-capitalize text-dark-blue">Admin Portal</h4>
+                        <p>Welcome, Whimstay Team Member! <strong class="text-dark-blue">Sign In</strong> on the top right corner of this page.<br><br><b> Who We Are</b><br>We are a unique, responsible, spontaneous community of mindful adventurers. We are successful business executives, thrill-seeking athletes, joyful parents and civic-minded community leaders.</p>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <img src="images/girl-kayak-mountains-768.jpg" style="width: 100%;" />
+                </div>
+            </div>
+        </div>
+    </section>
+    <!--end get started -->
+    <!-- Modal -->
+    <div id="myModal-Login" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <!--<h4 class="modal-title">Modal Header</h4>-->
+                </div>
+                <div class="modal-body">
+                    <form name="myForm">
+                        <div class="form-group">
+                            <h3 class="text-medium text-dark-blue font-weight-300 no-margin-bottom">Sign In</h3>
+                            <p class="text-small">Sign In using your mobile number.</p>
+                            <input type="text" class="form-control" id="mobile" name="mobile" placeholder="Mobile Number..."
+                                maxlength="10" autofocus />
+                            <span id="num" style="color:red;"></span>
+                            <!-- <p class="text-small">
+                                <input type="checkbox" id="keepLogin" name="keepLogin"> Keep me signed in.</p> -->
+                        </div>
+                        <button type="submit" onclick="mobileNumber()" id="signin" class="btn btn-blue btn-rounded btn-large width-95"
+                            data-target="#myModal-Verify" data-dismiss="modal" data-backdrop="static" data-keyboard="false">Continue</button>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        $("input[name='mobile']").keyup(function () {
+            $("#mobile").mask("999-999-9999");
+            $('#num').empty();
+        });
+    </script>
+    <!-- end Login form lightbox-->
+
+    <!-- start Mobile Verification form lightbox for Login-->
+    <!-- Modal -->
+    <div id="myModal-Verify" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <!--<h4 class="modal-title">Modal Header</h4>-->
+                </div>
+                <div class="modal-body">
+                    <form action="/dashboard" method="POST">
+                        <div class="form-group">
+                            <h3 class="text-medium text-dark-blue font-weight-300 no-margin-bottom">We Sent You A Text</h3>
+                            <p class="text-small">Please enter the verification code below.</p>
+                            <input type="text" class="form-control" id="mobileVerify" name="otpCode" placeholder="XXXXXX"
+                                autocomplete="off" maxlength="6" autofocus>
+                            <input type="hidden" name="mobileno" id="mobileNumber">
+                            <input type="hidden" name="userTypeId" value="1">
+                        </div>
+                        <button type="submit" class="btn btn-blue btn-rounded btn-large width-95">Sign In</button>
+                        <!-- onclick="saveUser()" -->
+                    </form>
+
+
+                </div>
+                <div class="modal-footer">
+                    <p class="text-extra-small text-center">Didn't get a code?
+                        <a href="#" data-toggle="modal" data-target="#myModal-Login" data-dismiss="modal">Let's try
+                            that again</a>. </p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <!-- end Mobile Verification form lightbox for Login-->
+
+    <div id="gen-popup" class="modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header" style="background-color: pink;">
+                    <span class="modal-title">Alert</span>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p id="message-body"></p>
+                </div>
+                <div class="modal-footer">
+                    <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- start Mobile Verification form lightbox-->
+    <!-- Modal -->
+    <div id="Signup-Verify" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <!--<h4 class="modal-title">Modal Header</h4>-->
+                </div>
+                <div class="modal-body">
+                    <form action="/dashboardUser" method="POST">
+                        <div class="form-group">
+                            <h3 class="text-medium text-dark-blue font-weight-300 no-margin-bottom">We Sent You A Text</h3>
+                            <p class="text-small">Please enter the verification code below</p>
+                            <input type="text" class="form-control" id="mobileVerify" name="otpCode" placeholder="XXXXXX"
+                                maxlength="6" autofocus>
+                            <input type="hidden" name="firstName" id="Name">
+                            <input type="hidden" name="lastName" id="lastname">
+                            <input type="hidden" name="emailId" id="emailID">
+                            <input type="hidden" name="mobileno1" id="mobileno12">
+                            <input type="hidden" name="dobDt" id="dateofBirth">
+                            <input type="hidden" name="userTypeId" value="1">
+                            <input type="hidden" name="dialerCode" id="dialerCode">
+                            <input type="hidden" name="signinFrom" value="Wemaste">
+
+                        </div>
+                        <button type="submit" class="btn btn-blue btn-rounded btn-large width-95">Sign Up</button>
+                        <!-- onclick="saveUser()" -->
+                    </form>
+
+
+                </div>
+                <div class="modal-footer">
+                    <p class="text-extra-small text-center">Didn't get a code?
+                        <a href="#" data-toggle="modal" data-target="#myModal-Login" data-dismiss="modal">Let's try
+                            that again</a>. </p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- end Mobile Verification form lightbox for Signup-->
+
+
+    <!-- Set to define functionality between Sign up and sign -->
+    <!-- Set to define functionality between Sign up and sign -->
+
+    </form>
+    <!--footer Start-->
+    <footer class="bg-dark-blue padding-30px-tb text-center">
+        <div class="footer-widget-area">
+            <div class="container">
+                <div class="row">
+                    <div class="medium-icon social-icon-style-3 social_icon list-inline margin-20px-top">
+                        <a class="facebook text-white facebook-bg-hvr wow fadeInUp" data-wow-duration=".5s" href="https://facebook.com/wemastevacation"
+                            target="_blank"><i class="fab fa-facebook-f"></i><span></span></a>
+                        <a class="instagram text-white instagram-bg-hvr wow fadeInDown" data-wow-duration=".5s" href="https://www.instagram.com/wemaste/"
+                            target="_blank"><i class="fab fa-instagram"></i><span></span></a>
+                        <a class="linkedin text-white linkedin-bg-hvr wow fadeInUp" data-wow-duration=".5s" href="https://linkedin.com/company/wemaste"
+                            target="_blank"><i class="fab fa-linkedin-in"></i><span></span></a>
+
+                    </div>
+                </div>
+                <p class="text-white text-large margin-10px-bottom margin-20px-top">© Whimstay, Inc. All Rights
+                    Reserved.</p>
+                <!-- <p class="text-white"><a href="./termsAndCondition"></a>Terms & Privacy</a> </p> -->
+            </div>
+        </div>
+    </footer>
+    <!-- end footer -->
+    <!-- javascript libraries -->
+
+
+    <!-- setting -->
+    <!-- <script src="../public/javascripts/main.js"></script> -->
+    <script src="../public/javascripts/validate.js"></script>
+    <!-- <script src="../public/javascripts/global.js"></script> -->
+
+    <script>
+        $('.modal').on('shown.bs.modal', function () {
+            $(this).find('[autofocus]').focus();
+        });
+    </script>
+
+    <script>
+
+
+        $("#dob_year,#dob_month,#dob_day").change(function () {
+            getStartDate();
+        });
+        function getStartDate() {
+            var startAth = $("#dob_year").val();
+            if (startAth === "") {
+                $("#fullDob").val('');
+                // console.log("start at hours missing");
+                return;
+            }
+            var startAtm = $("#dob_month").val();
+            if (startAtm == "") {
+                $("#fullDob").val('');
+                //   console.log("start at minutes missing");
+                return;
+            }
+            var startAtam = $("#dob_day").val();
+            if (startAtm == "") {
+                $("#fullDob").val('');
+                //  console.log("start at AM/PM missing");
+                return;
+            }
+            var startDate = startAth + "-" + startAtm + "-" + startAtam;
+            $("#fullDob").val(startDate);
+        }
+
+    </script>
+    <script>
+
+        function numberOnly(txt, e) {
+            var arr = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz- ";
+            var code;
+            if (window.event)
+                code = e.keyCode;
+            else
+                code = e.which;
+            var char = keychar = String.fromCharCode(code);
+            if (arr.indexOf(char) == -1)
+                return false;
+
+        }
+    </script>
+    <script>
+        $(document).ready(function(){
+            document.execCommand('ClearAuthenticationCache');
+        })
+    </script>
+
+</body>
+
+</html>

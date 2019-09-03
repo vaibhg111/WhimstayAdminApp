@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Admin-Booking Refund</title>
+    <style>
+        div.dataTables_wrapper {
+            margin: 0 auto;
+        }
+
+        input[type=number]::-webkit-outer-spin-button,
+        input[type=number]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+
+        hr {
+            display: block;
+            height: 1px;
+            border: 0;
+            border-top: 1px solid #ccc;
+            margin: 1em 0;
+            padding: 0;
+        }
+    </style>
+</head>
+
+<body id="page-top">
+    <%- include header.ejs %>
+    <div id="wrapper">
+        <%- include sidenav.ejs %>
+        <div id="content-wrapper">
+            <div class="container-fluid">
+                <input type="hidden" value="<%= data %>" id="userId">
+                <input type="hidden" id="userProfileId" class="form-control">
+                <div class="container">
+                    <div id="bookingRefundId"></div>
+
+                    <script>
+                        var total;
+                        $(document).ready(function () {
+                            $.ajax({
+                                type: "GET",
+                                contentType: "application/json",
+                                headers: {
+                                    "content-type": "application/json",
+                                    Authorization: localStorage.getItem('token') || ''
+                                },
+
+                                url: globalUrl + 'v1/user/' + document.getElementById("userId").value + '/booking/refund/' + sessionStorage.getItem("bookingId"),
+                                success: function (result) {
+                                    var Itinerary = moment(result.checkIn).format('MMM D') + ' to ' + moment(result.checkOut).format('MMM D')
+                                    var mobile = result.mobile;
+                                    var refunded;
+
+                                    if (result.refunded > 0) {
+                                        buttonStatus = '<button class="btn btn-blue btn-rounded" disabled>Submit</button>';
+                                        buttonDisabled = '<button class="btn btn-blue btn-rounded" disabled">Submit</button>'
+                                    } else {
+                                        buttonStatus = '<button class="btn btn-blue btn-rounded" onclick="submitNewNote()">Submit</button>';
+                                        buttonDisabled = '<button class="btn btn-blue btn-rounded" onclick="validateRefund()">Submit</button>'
+                                    }
+
+                                    if (result.refunded == null || result.refunded == undefined) {
+                                        refunded = "";
+                                    } else {
+                                        refunded = result.refunded.toFixed(2);
+                                    }
+
+                                    if (result.bookingTotal == null || result.bookingTotal == undefined) {
+                                        total = "";
+                                    } else {
+                                        total = parseInt(result.bookingTotal.toFixed(2));
+                                    }
+                                    // sessionStorage.setItem("bookingNumber",result.bookingNo);
+                                    mobile = mobile.replace(/(\d{3})(\d{3})(\d{4})/, '($1) $2-$3')
+                                    var cnt = 0;
+                                    var refundDate = moment(result.bookingDate).format('MMM DD YYYY');
+                                    $('#bookingRefundId').append('<h6>Booking Refund # ' + result.bookingNo + '</h6><hr /><div class="row"><div id="Status" style="float:left;margin: 20px;"><strong>Status : </strong>' + result.status + ' </div><div id="date" style="float:left;margin: 20px;"><strong>Date : </strong>' + refundDate + '</div>' +
+                                        '<div id="deposit" style="float:left;margin: 20px;"><strong>Total : </strong>' + total + '</div><div id="refund" style="float:left;margin: 20px;"><strong>Refunded : </strong>' + refunded + '</div><div id="refunded" style="float:left;margin: 20px;"><strong>Booking Number : </strong>' + result.bookingNo + '</div></div>' +
+                                        '<div class="row"><div id="bookingno" style="float:left;margin: 20px;"><strong>Guest : </strong>' + result.guestName + '</div><div id="host" style="float:left;margin: 20px;"><strong>Phone : </strong>' + mobile + '</div><div id="phone" style="float:left;margin: 20px;"><strong>Email Id : </strong>' + result.email + '</div>' +
+                                        '<div id="email" style="float:left;margin: 20px;"><strong>Itinerary : </strong>' + Itinerary + '</div></div><div class="row"><div style="float:left;margin: 20px;"><strong>Address : </strong>' + result.address + '</div></div><hr />' +
+                                        '<div class="form-group" id="RefundNoteDiv"></div>' +
+                                        '</div><div class="form-group"><span id="newNote"><b>New Note :</b><textarea id="addnewNote" onkeypress="validateInput()"></textarea></span><span id="addnewNote1" style="display:none;color:red;">Please add a Note.</span></div>' + buttonStatus + '</div><hr />' +
+                                        '<div class="form-group"><div class="row"><div class="col-sm-4"><div id="refundAmountspan"><b>Refund Amount :</b><input type="number" min=0 id="refundAmount" onInput="return check(event,value)" step="0.01" onkeypress="validateInput()"></div></div><div class="col-sm-1"></div><div class="col-sm-4"><label id="refundtype"><b>Refund Type :</b></label><select class="form-control" id="refundType" onchange="validateInput()" style="margin-top: -14px;"><option id="0" value="0">Select...</option><option id="1" value="Cancellation">Cancellation</option><option id="2" value="Partial Refund">Partial Refund</option><option id="3" value="Full Refund">Full Refund</option></select><span id="refundTypespan1" style="display:none;color:red;">Please fill Refund Type.</span></div></div><span id="refundAmountspan1" style="display:none;color:red;">Please fill Refund Amount.</span><span id="refundNotespan"><b>Refund Note :</b>' +
+                                        '<textarea id="refundNote" onkeypress="validateInput()"></textarea></span><span id="refundNotespan1" style="display:none;color:red;">Please fill Refund Note.</span>' + buttonDisabled + '</div>');
+                                    result.aAdminBookingRefundNote.forEach(element => {
+                                        var refundDate = moment(element.createDt).format('MM/DD/YYYY');
+                                        $('#RefundNoteDiv').append('<div class="form-group"><div id="RefundNoteDiv' + cnt + '"><b>Note ' + refundDate + ' :</b></div><span id="claimNote' + cnt + '">' + element.bookingRefundNote + '</span>');
+                                        cnt++;
+                                    });
+                                },
+                                error: function (jqXHR, textStatus, errorThrown) {
+
+                                }
+
+                            });
+                        })
+                        function submitNewNote() {
+
+                            if (document.getElementById("addnewNote").value == null || document.getElementById("addnewNote").value == "") {
+                                document.getElementById('addnewNote1').style.display = "block";
+                                document.getElementById("addnewNote").focus();
+                                return false;
+                            } else {
+                                document.getElementById("addnewNote1").style.display = "none";
+                            }
+
+                            var addnewNote = document.getElementById("addnewNote").value;
+                            var bookingId = sessionStorage.getItem("bookingId");
+                            var CurrentDate = moment().unix();
+                            var NoteDesc = {
+                                "bookingRefundNote": addnewNote
+                            }
+                            $.ajax({
+                                type: "POST",
+                                contentType: "application/json",
+                                dataType: 'json',
+                                headers: {
+                                    "content-type": "application/json",
+                                    Authorization: localStorage.getItem('token') || ''
+                                },
+                                data: JSON.stringify(NoteDesc),
+
+                                url: globalUrl + 'v1/user/' + document.getElementById("userId").value + '/refund/' + bookingId,
+                                success: function (result) {
+                                    // console.log(result);
+                                    window.location.reload();
+                                },
+                                error: function (jqXHR, textStatus, errorThrown) {
+
+                                }
+
+                            });
+                        }
+
+                        function validateRefund() {
+                            if (document.getElementById("refundNote").value == null || document.getElementById("refundNote").value == "") {
+                                document.getElementById('refundNotespan1').style.display = "block";
+                                document.getElementById("refundNote").focus();
+                                return false;
+                            } else {
+                                document.getElementById("refundNotespan1").style.display = "none";
+                            }
+
+                            if (document.getElementById("refundAmount").value == null || document.getElementById("refundAmount").value == "") {
+                                document.getElementById('refundAmountspan1').style.display = "block";
+                                document.getElementById("refundAmount").focus();
+                                return false;
+                            } else {
+                                document.getElementById("refundAmountspan1").style.display = "none";
+                            }
+
+                            if (document.getElementById("refundType").value == null || document.getElementById("refundType").value == "" || document.getElementById("refundType").value == 0) {
+                                document.getElementById('refundTypespan1').style.display = "block";
+                                document.getElementById("refundType").focus();
+                                return false;
+                            } else {
+                                document.getElementById("refundTypespan1").style.display = "none";
+                            }
+
+                            if (parseInt(document.getElementById("refundAmount").value) > total) {
+                                document.getElementById("refundAmountspan1").innerHTML = "Refund Amount should not greater than Total Amount.";
+                                document.getElementById("refundAmountspan1").style.display = "block";
+                                return false;
+                            } else {
+                                document.getElementById("refundAmountspan1").innerHTML = "";
+                            }
+                            $('#Confirm_Modal').modal({ backdrop: 'static', keyboard: false }, 'show');
+                        }
+
+                        function submitRefund() {
+
+                            var bookingId = sessionStorage.getItem("bookingId");
+                            var refundAmount = document.getElementById("refundAmount").value;
+                            var refundType = document.getElementById("refundType").value;
+                            var refundNote = document.getElementById("refundNote").value;
+                            var refundData = {
+                                "bookingId": bookingId,
+                                "refundAmount": refundAmount,
+                                "refundTypeDesc": refundType,
+                                "refundNote": refundNote
+                            }
+                            $.ajax({
+                                type: 'PUT',
+                                data: JSON.stringify(refundData),
+                                contentType: "application/json",
+                                headers: {
+                                    "content-type": "application/json",
+                                    Authorization: localStorage.getItem('token') || ''
+                                },
+                                dataType: 'json',
+                                url: globalUrl + 'v1/user/' + document.getElementById("userId").value + '/booking/refundtype',
+                                success: function (result) {
+                                    //console.log(JSON.stringify(result));
+                                    window.location.reload();
+                                },
+                                error: function (xhr, textStatus, errorThrown) {
+
+                                }
+                            });
+                        }
+
+                        function validateInput() {
+                            document.getElementById('refundNotespan1').style.display = "none";
+                            document.getElementById('refundAmountspan1').style.display = "none";
+                            document.getElementById('refundTypespan1').style.display = "none";
+                            document.getElementById("addnewNote1").style.display = "none";
+                        }
+
+                        check = function (e, value) {
+                            if (!e.target.validity.valid) {
+                                e.target.value = value.substring(0, value.length - 1);
+                                return false;
+                            }
+                            var idx = value.indexOf('.');
+                            if (idx >= 0) {
+                                if (value.length - idx > 3) {
+                                    e.target.value = value.substring(0, value.length - 1);
+                                    return false;
+                                }
+                            }
+                            return true;
+                        }
+                    </script>
+                </div>
+            </div>
+            <div class="modal fade" id="Confirm_Modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel"></h5>
+                            <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">Do you want to submit?</div>
+                        <div class="modal-footer">
+                            <button class="btn btn-secondary btn-rounded" type="button"
+                                data-dismiss="modal">Back</button>
+                            <a class="btn btn-blue btn-rounded" onclick="submitRefund()">Confirm</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <%- include footer.ejs %>
+</body>
+
+</html>

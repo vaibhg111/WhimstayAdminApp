@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Admin-Caller Verification</title>
+    <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.inputmask/3.1.60/inputmask/jquery.inputmask.js"></script> -->
+    <!-- <script src="../public/jQuery-Mask/src/jquery.mask.js"></script> -->
+
+</head>
+
+
+<body id="page-top">
+    <%- include header.ejs %>
+    <div id="wrapper">
+        <%- include sidenav.ejs %>
+        <div id="content-wrapper">
+
+            <div class="container-fluid">
+                <input type="hidden" value="<%= data %>" id="userId">
+                <input type="hidden" id="userProfileId" class="form-control">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-12 margin-30px-bottom">
+                            <div class="container-fluid">
+                                <input type="hidden" value="<%= data %>" id="userId">
+                                <input type="hidden" id="userProfileId" class="form-control">
+                                <div class="container">
+                                    <div id="faqSectionDisplay" style="margin-top:15px;"></div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-md-3">
+                                        <label for="callOn" class="">Enter Mobile Number : </label>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <input type="text" class="form-control" id="callOn" max="10" name="callOn"
+                                            onkeypress="return validatePhn(event)" value="" maxlength="10">
+                                        <span id="contactmobErrDisplay" style="color: red;"></span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-md-3">
+                                        <button class="btn btn-blue btn-rounded" type="button" onclick="validate()"
+                                            style="margin-right: 20px;">Submit</button>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div id="myModal-Verify" class="modal fade" role="dialog">
+                                <div class="modal-dialog">
+
+                                    <!-- Modal content-->
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                            <!--<h4 class="modal-title">Modal Header</h4>-->
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="form-group">
+                                                <h3 class="text-medium text-dark-blue font-weight-300 no-margin-bottom">
+                                                    We Sent You A Text</h3>
+                                                <p class="text-small">Please enter the verification code below.</p>
+                                                <input type="text" class="form-control" id="mobileVerify"
+                                                    onkeypress="verifyOtp(event)" name="otpCode" placeholder="XXXXXX"
+                                                    autocomplete="off" maxlength="6" autofocus>
+                                                <span id="otpCodeErr" style="color: red"></span>
+                                                <input type="hidden" name="mobileno" id="mobileNumber">
+                                                <input type="hidden" name="userTypeId" value="1">
+                                            </div>
+                                            <button type="submit" class="btn btn-blue btn-rounded btn-large width-100"
+                                                id="otpValidate">Verify User</button>
+                                            <!-- onclick="saveUser()" -->
+                                        </div>
+                                        <div class="modal-footer">
+                                            <p class="text-extra-small text-center" style="margin-right: 100px;">Didn't
+                                                get a code?
+                                                <a href="/callerVerification" data-dismiss="modal"
+                                                    onclick="emptyField()">Let's try that again</a>. </p>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div id="myModal-OtpSuccessful" class="modal fade" role="dialog">
+                                <div class="modal-dialog">
+
+                                    <!-- Modal content-->
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal"
+                                                onclick="window.location.reload()">&times;</button>
+                                            <!--<h4 class="modal-title">Modal Header</h4>-->
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="form-group">
+                                                <h3 class="text-medium text-dark-blue font-weight-300 no-margin-bottom">
+                                                    User Successfully Verified.</h3>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <%- include footer.ejs %>
+
+
+    <!-- <script>
+            $("input[name='callOn']").keyup(function () {
+                $("#callOn").inputmask("999-999-9999");
+                $('#contactmobErrDisplay').empty();
+            });
+        </script> -->
+
+    <script>
+        var baseURL = globalUrl;
+
+        function emptyField() {
+            $('#mobileVerify').val('');
+            document.getElementById("otpCodeErr").innerHTML = "";
+        }
+        function validatePhn(event) {
+            document.getElementById("contactmobErrDisplay").innerHTML = "";
+            var charCode = event.which || event.keyCode;
+            if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+                return false;
+            }
+            return true;
+        }
+
+        function verifyOtp(event) {
+            $('#otpCodeErr').empty();
+            var charCode = event.which || event.keyCode;
+            if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+                event.preventDefault();
+            } else {
+                return true;
+            }
+        }
+
+        function validate() {
+            if (document.getElementById("callOn").value == null || document.getElementById("callOn").value == undefined || document.getElementById("callOn").value == "") {
+                document.getElementById("contactmobErrDisplay").innerHTML = "Please enter mobile number";
+                return false;
+            } else {
+                document.getElementById("contactmobErrDisplay").innerHTML = "";
+            }
+            var mob = document.getElementById("callOn").value;
+            if (mob.length > 10 || mob.length < 10) {
+                document.getElementById("contactmobErrDisplay").innerHTML = "Mobile number should be of 10 digits.";
+                return false;
+            } else {
+                document.getElementById("contactmobErrDisplay").innerHTML = "";
+            }
+            var output = document.getElementById("callOn").value;
+            output = output.replace(/\D+/g, '');
+            if (output != "") {
+                document.getElementById("mobileNumber").value = output;
+            }
+            verifyMobile();
+        }
+
+        function verifyMobile() {
+            var mobile = document.getElementById("callOn").value;
+            $.ajax({
+                type: "GET",
+                dataType: "json",
+                headers: {
+                    "content-type": "application/json",
+                    Authorization: localStorage.getItem('token') || ''
+                },
+                url: baseURL + "v1/user/login/mobile/" + mobile,
+                success: function (result) {
+
+                    var checkStatus = result.status;
+                    if (checkStatus == 0) {
+                        $.ajax({
+                            type: "GET",
+                            dataType: "json",
+                            headers: {
+                                "content-type": "application/json",
+                                Authorization: localStorage.getItem('token') || ''
+                            },
+                            url: baseURL + "v1/user/login/mobile/" + mobile + "/otp",
+                            success: function (result) {
+                                //console.log("OTP has sent your Mobile Number");
+                            },
+                            error: function (error) {
+
+                                jsonValue = jQuery.parseJSON(error.responseText);
+                                //console.log("error" + error.responseText);
+                            }
+                        });
+                        $('#myModal-Verify').modal({ backdrop: 'static', keyboard: false }, 'show');
+                    } else {
+
+                        document.getElementById("contactmobErrDisplay").innerHTML = 'User does not exists with this mobile : ' + mobile + '.';
+                        $('#myModal-Verify').modal('hide');
+                        $('#gen-popup').modal('show');
+                        return false;
+
+                    }
+                },
+                error: function (error) {
+                    // console.log("error" + error.responseText);
+                }
+            });
+        }
+
+        $('#otpValidate').click(function () {
+            var mobile = document.getElementById("mobileNumber").value;
+            var otpCode = document.getElementById("mobileVerify").value;
+            var data = {
+                "mobileno": mobile,
+                "otpCode": otpCode,
+                "userTypeId": "1"
+            }
+            $.ajax({
+                type: "POST",
+                dataType: "json",
+                contentType: "application/json",
+                headers: {
+                    "content-type": "application/json",
+                    Authorization: localStorage.getItem('token') || ''
+                },
+                data: JSON.stringify(data),
+                url: baseURL + "v1/user/login",
+                success: function (result) {
+                    var verifiedOtp = document.getElementById("mobileVerify").value;
+                    if (verifiedOtp == '' || verifiedOtp == null || verifiedOtp == undefined) {
+                        document.getElementById("otpCodeErr").innerHTML = "Please enter OTP.";
+                    } else {
+                        document.getElementById("otpCodeErr").innerHTML = "";
+                        if (result.status == 0) {
+                            document.getElementById("otpCodeErr").innerHTML = "Incorrect OTP entered.";
+                        } else {
+                            document.getElementById("otpCodeErr").innerHTML = "";
+                            $('#myModal-Verify').modal('hide');
+                            $('#myModal-OtpSuccessful').modal({ backdrop: 'static', keyboard: false }, 'show');
+                        }
+                    }
+
+                },
+                error: function (error) {
+
+                    jsonValue = jQuery.parseJSON(error.responseText);
+                    //console.log("error" + error.responseText);
+                }
+            });
+        })
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <title>Admin-Dashboard</title>
+  <style>
+    form input,
+    button {
+      padding: 5px;
+    }
+
+    table {
+      width: 100%;
+      margin-bottom: 20px;
+      border-collapse: collapse;
+    }
+
+    table,
+    th,
+    td {
+      border: 1px solid #FC97B9;
+    }
+
+    table th,
+    table td {
+      /* padding: 10px; */
+      /* text-align: center; */
+      font-family: montserrat;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font: 16px Arial;
+    }
+
+    .autocomplete {
+      /*the container must be positioned relative:*/
+      position: relative;
+      display: inline-block;
+    }
+
+    form {
+      margin-top: 100px;
+    }
+
+    input {
+      border: 1px solid transparent;
+      background-color: #f1f1f1;
+      padding: 10px;
+      font-size: 16px;
+      font-family: montserrat;
+    }
+
+    input[type=text] {
+      background-color: #f1f1f1;
+      width: 100%;
+    }
+
+    input[type=submit] {
+      background-color: DodgerBlue;
+      color: #fff;
+      cursor: pointer;
+    }
+
+    .autocomplete-items {
+      position: absolute;
+      border: 1px solid #d4d4d4;
+      border-bottom: none;
+      border-top: none;
+      z-index: 99;
+      top: 100%;
+      left: 0;
+      right: 0;
+    }
+
+    .autocomplete-items div {
+      padding: 10px;
+      cursor: pointer;
+      background-color: #fff;
+      border-bottom: 1px solid #d4d4d4;
+    }
+
+    .autocomplete-items div:hover {
+      /*when hovering an item:*/
+      background-color: #e9e9e9;
+    }
+
+    .autocomplete-active {
+      /*when navigating through the items using the arrow keys:*/
+      background-color: DodgerBlue !important;
+      color: #ffffff;
+    }
+
+    div.dataTables_wrapper {
+      margin: 0 auto;
+    }
+
+    .dataTables_scrollBody {
+      position: relative;
+      overflow: auto;
+      width: 100%;
+      margin-top: -18px;
+    }
+
+    input[type=number]::-webkit-outer-spin-button,
+    input[type=number]::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    input[type=number] {
+      -moz-appearance: textfield;
+    }
+
+    .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+      color: white !important;
+      background: linear-gradient(to bottom, #ffffff 0%, rgb(255, 255, 255) 100%);
+      background-color: #ffffff;
+      border: #ffffff;
+    }
+
+    .dataTables_wrapper .dataTables_paginate .paginate_button {
+      padding: 0px;
+    }
+
+    .page-item.active .page-link {
+      color: #02C6C4;
+      background-color: #ffffff;
+      border-color: #dee2e6;
+    }
+
+    .pagination>li>a {
+      color: #02C6C4;
+    }
+
+    #userproperty_table_paginate {
+      margin-left: 140px;
+    }
+
+    #userproperty_table_filter {
+      margin-left: 245px;
+    }
+
+    .pagination>li>a,
+    .pagination>li>span {
+      position: relative;
+      float: left;
+      padding: 6px 12px;
+      margin-left: -1px;
+      line-height: 1.42857143;
+      text-decoration: none;
+      background-color: #fff;
+      border: 1px solid #ddd;
+    }
+
+    .page-link {
+      /* position: relative; */
+      display: block;
+      padding: .5rem .75rem;
+      /* margin-left: -1px; */
+      line-height: 1.25;
+      color: #007bff;
+      /* background-color: #fff; */
+      border: 1px solid #dee2e6;
+    }
+
+    /* .dataTables_filter, */
+    .dataTables_info,
+    .dataTables_length {
+      display: none;
+    }
+  </style>
+
+</head>
+
+<body id="page-top">
+  <%- include header.ejs %>
+  <div id="wrapper">
+    <%- include sidenav.ejs %>
+    <div id="content-wrapper">
+
+      <div class="container-fluid">
+
+        <!-- Breadcrumbs-->
+        <script>
+        </script>
+        <div class="breadcrumb">
+          <div class="col-xl-4 col-sm-6 mb-3">
+            <button class="btn btn-blue btn-rounded btn-large width-100" onclick="hostBased()">Host based property
+              search</button>
+          </div>
+          <div class="col-xl-4 col-sm-6 mb-3">
+            <button class="btn btn-blue btn-rounded btn-large width-100" onclick="locationBased()">Location based
+              property search</button>
+          </div>
+          <div class="col-xl-4 col-sm-6 mb-3">
+            <button class="btn btn-blue btn-rounded btn-large width-100" onclick="hostSearch()">Host search</button>
+          </div>
+        </div>
+
+        <script>
+
+          $(document).ready(function () {
+            document.getElementById("showEmail").style.display = "none";
+            document.getElementById("showMobile").style.display = "none";
+            document.getElementById("showCity").style.display = "none";
+            document.getElementById("submitBtn").style.display = "none";
+            document.getElementById("showLname").style.display = "none";
+            document.getElementById("showFname").style.display = "none";
+            document.getElementById("showState").style.display = "none";
+            document.getElementById("showCountry").style.display = "none";
+            document.getElementById("propertyRecords").style.display = "none";
+          });
+
+          function hostBased() {
+            $('#mail').empty();
+            $('#number').empty();
+            $('#mail1').empty();
+            $('#number1').empty();
+            $('#emailInput').val('');
+            $('#mobileInput').val('');
+            $('#cityInput').val('');
+            $('#emailInput1').val('');
+            $('#mobileInput1').val('');
+            $('#cityInput1').val('');
+            $('#stateInput').val('');
+            $('#countryInput').val('');
+            $('#fnameInput').val('');
+            $('#lnameInput').val('');
+            document.getElementById("showEmail").style.display = "block";
+            document.getElementById("showMobile").style.display = "block";
+            document.getElementById("showCity").style.display = "block";
+            document.getElementById("submitBtn").style.display = "block";
+            document.getElementById("showLname").style.display = "none";
+            document.getElementById("showFname").style.display = "none";
+            document.getElementById("showState").style.display = "none";
+            document.getElementById("showCountry").style.display = "none";
+            document.getElementById("showEmail1").style.display = "none";
+            document.getElementById("showMobile1").style.display = "none";
+            document.getElementById("showCity1").style.display = "none";
+            document.getElementById("propertyRecords").style.display = "none";
+            document.getElementById("emailInput").disabled = false;
+            document.getElementById("mobileInput").disabled = false;
+            document.getElementById("emailInput1").disabled = false;
+            document.getElementById("mobileInput1").disabled = false;
+            document.getElementById("fnameInput").disabled = false;
+            document.getElementById("lnameInput").disabled = false;
+            document.getElementById("emailInput1").disabled = false;
+            document.getElementById("mobileInput1").disabled = false;
+            document.getElementById("cityInput1").disabled = false;
+            document.getElementById("cityInput").disabled = false;
+            document.getElementById("stateInput").disabled = false;
+            document.getElementById("countryInput").disabled = false;
+          }
+
+          function locationBased() {
+            $('#mail').empty();
+            $('#number').empty();
+            $('#mail1').empty();
+            $('#number1').empty();
+            $('#emailInput').val('');
+            $('#mobileInput').val('');
+            $('#cityInput').val('');
+            $('#emailInput1').val('');
+            $('#mobileInput1').val('');
+            $('#cityInput1').val('');
+            $('#stateInput').val('');
+            $('#countryInput').val('');
+            $('#fnameInput').val('');
+            $('#lnameInput').val('');
+            document.getElementById("showState").style.display = "block";
+            document.getElementById("showCity1").style.display = "block";
+            document.getElementById("showCountry").style.display = "block";
+            document.getElementById("submitBtn").style.display = "block";
+            document.getElementById("showFname").style.display = "none";
+            document.getElementById("showLname").style.display = "none";
+            document.getElementById("showEmail").style.display = "none";
+            document.getElementById("showMobile").style.display = "none";
+            document.getElementById("showEmail1").style.display = "none";
+            document.getElementById("showMobile1").style.display = "none";
+            document.getElementById("showCity").style.display = "none";
+            document.getElementById("propertyRecords").style.display = "none";
+            document.getElementById("emailInput").disabled = false;
+            document.getElementById("mobileInput").disabled = false;
+            document.getElementById("fnameInput").disabled = false;
+            document.getElementById("lnameInput").disabled = false;
+            document.getElementById("cityInput").disabled = false;
+            document.getElementById("emailInput1").disabled = false;
+            document.getElementById("mobileInput1").disabled = false;
+            document.getElementById("cityInput1").disabled = false;
+            document.getElementById("stateInput").disabled = false;
+            document.getElementById("countryInput").disabled = false;
+          }
+
+          function hostSearch() {
+            $('#mail').empty();
+            $('#number').empty();
+            $('#mail1').empty();
+            $('#number1').empty();
+            $('#emailInput').val('');
+            $('#mobileInput').val('');
+            $('#cityInput').val('');
+            $('#emailInput1').val('');
+            $('#mobileInput1').val('');
+            $('#cityInput1').val('');
+            $('#stateInput').val('');
+            $('#countryInput').val('');
+            $('#fnameInput').val('');
+            $('#lnameInput').val('');
+            document.getElementById("showFname").style.display = "block";
+            document.getElementById("showLname").style.display = "block";
+            document.getElementById("showEmail1").style.display = "block";
+            document.getElementById("showMobile1").style.display = "block";
+            document.getElementById("submitBtn").style.display = "block";
+            document.getElementById("showCity").style.display = "none";
+            document.getElementById("showEmail").style.display = "none";
+            document.getElementById("showMobile").style.display = "none";
+            document.getElementById("showCity1").style.display = "none";
+            document.getElementById("showState").style.display = "none";
+            document.getElementById("showCountry").style.display = "none";
+            document.getElementById("propertyRecords").style.display = "none";
+            document.getElementById("emailInput").disabled = false;
+            document.getElementById("mobileInput").disabled = false;
+            document.getElementById("fnameInput").disabled = false;
+            document.getElementById("lnameInput").disabled = false;
+            document.getElementById("cityInput").disabled = false;
+            document.getElementById("emailInput1").disabled = false;
+            document.getElementById("mobileInput1").disabled = false;
+            document.getElementById("cityInput1").disabled = false;
+            document.getElementById("stateInput").disabled = false;
+            document.getElementById("countryInput").disabled = false;
+          }
+
+          function emailFocus() {
+            document.getElementById("mobileInput").disabled = true;
+            document.getElementById("cityInput").disabled = true;
+          }
+
+          function mobileFocus() {
+            document.getElementById("emailInput").disabled = true;
+            document.getElementById("cityInput").disabled = true;
+          }
+
+          function cityFocus() {
+            document.getElementById("emailInput").disabled = true;
+            document.getElementById("mobileInput").disabled = true;
+          }
+
+          function emailFocus1() {
+            document.getElementById("mobileInput1").disabled = true;
+            document.getElementById("fnameInput").disabled = true;
+            document.getElementById("lnameInput").disabled = true;
+          }
+
+          function mobileFocus1() {
+            document.getElementById("emailInput1").disabled = true;
+            document.getElementById("fnameInput").disabled = true;
+            document.getElementById("lnameInput").disabled = true;
+          }
+
+          function cityFocus1() {
+            document.getElementById("countryInput").disabled = true;
+            document.getElementById("stateInput").disabled = true;
+          }
+
+          function stateFocus() {
+            document.getElementById("cityInput1").disabled = true;
+            document.getElementById("countryInput").disabled = true;
+          }
+
+          function countryFocus() {
+            document.getElementById("cityInput1").disabled = true;
+            document.getElementById("stateInput").disabled = true;
+          }
+
+          function firstnameFocus() {
+            document.getElementById("emailInput1").disabled = true;
+            document.getElementById("mobileInput1").disabled = true;
+            document.getElementById("lnameInput").disabled = true;
+          }
+
+          function lastnameFocus() {
+            document.getElementById("emailInput1").disabled = true;
+            document.getElementById("mobileInput1").disabled = true;
+            document.getElementById("fnameInput").disabled = true;
+          }
+        </script>
+
+        <!-- Icon Cards-->
+        <div class="row">
+          <div class="col-sm-4">
+            <div class="form-group">
+              <div id="showEmail" style="display:none;" class="col-xl-4 col-sm-6 mb-3">
+                <div class="autocomplete" style="width:200px;">
+                  <input id="emailInput" type="text" name="emailId" onfocus="emailFocus()" placeholder="Email ID">
+                </div>
+              </div>
+              <span class="text-center" id="mail" style="color:red;margin-left: 20px;"></span>
+            </div>
+          </div>
+
+          <div class="col-sm-4">
+            <div class="form-group">
+              <div id="showMobile" style="display:none;" class="col-xl-4 col-sm-6 mb-3">
+                <div class="autocomplete" style="width:200px;">
+                  <input id="mobileInput" type="text" name="mobileId" onfocus="mobileFocus()" placeholder="Mobile No">
+                </div>
+              </div>
+              <span class="text-center" id="number" style="color:red;"></span>
+            </div>
+          </div>
+
+          <div class="col-sm-4">
+            <div class="form-group">
+              <div id="showCity" style="display:none;" class="col-xl-4 col-sm-6 mb-3">
+                <div class="autocomplete" style="width:200px;">
+                  <input id="cityInput" type="text" name="cityId" onfocus="cityFocus()" placeholder="City">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row" style="margin-top:-30px;">
+          <div class="col-sm-4">
+            <div class="form-group">
+              <div id="showCity1" style="display:none;" class="col-xl-4 col-sm-6 mb-3">
+                <div class="autocomplete" style="width:200px;">
+                  <input id="cityInput1" type="text" name="cityId1" onfocus="cityFocus1()" placeholder="City">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-sm-4">
+            <div class="form-group">
+              <div id="showState" style="display:none;" class="col-xl-4 col-sm-6 mb-3">
+                <div class="autocomplete" style="width:200px;">
+                  <input id="stateInput" type="text" name="stateId" onfocus="stateFocus()" placeholder="State">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-sm-4">
+            <div class="form-group">
+              <div id="showCountry" style="display:none;" class="col-xl-4 col-sm-6 mb-3">
+                <div class="autocomplete" style="width:200px;">
+                  <input id="countryInput" type="text" name="countryId" onfocus="countryFocus()" placeholder="Country">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row" style="margin-top:-18px;">
+          <div class="col-sm-4">
+            <div class="form-group">
+              <div id="showEmail1" style="display:none;" class="col-xl-4 col-sm-6 mb-3">
+                <div class="autocomplete" style="width:200px;">
+                  <input id="emailInput1" type="text" name="emailId1" onfocus="emailFocus1()" placeholder="Email ID">
+                </div>
+              </div>
+              <span class="text-center" id="mail1" style="color:red;margin-left: 20px;"></span>
+            </div>
+          </div>
+
+          <div class="col-sm-4">
+            <div class="form-group">
+              <div id="showMobile1" style="display:none;" class="col-xl-4 col-sm-6 mb-3">
+                <div class="autocomplete" style="width:200px;">
+                  <input id="mobileInput1" type="text" name="mobileId1" onfocus="mobileFocus1()"
+                    placeholder="Mobile No">
+                </div>
+              </div>
+              <span class="text-center" id="number1" style="color:red;"></span>
+            </div>
+          </div>
+
+          <div class="col-sm-4">
+            <div class="form-group">
+              <div id="showFname" style="display:none;" class="col-xl-4 col-sm-6 mb-3">
+                <div class="autocomplete" style="width:200px;">
+                  <input id="fnameInput" type="text" name="fnameId" onfocus="firstnameFocus()" placeholder="First Name">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-sm-4">
+            <div class="form-group">
+              <div id="showLname" style="display:none;" class="col-xl-4 col-sm-6 mb-3">
+                <div class="autocomplete" style="width:200px;">
+                  <input id="lnameInput" type="text" name="lnameId" onfocus="lastnameFocus()" placeholder="Last Name">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <br><br>
+        <div id="submitBtn" style="display:none;" class="text-center">
+          <button class="btn btn-blue btn-rounded col-md-4" role="button" onclick="onSearch()">Submit</button>
+          <!-- <button class="btn btn-blue btn-rounded col-md-4" role="button" onclick="onDownload(event)">Download</button>
+          <button class="btn btn-blue btn-rounded col-md-4" role="button" onclick="onUpload()">Upload</button> -->
+        </div>
+        <br><br>
+
+        <!-- DataTables Example -->
+        <br><br><br><br>
+        <div id="propertyRecords" style="display:none;" class="card mb-3">
+          <div class="card-header">
+            <i class="fas fa-table"></i>
+            Property Records</div>
+          <br>
+          <div class="row">
+            <div class="col-md-12 margin-30px-bottom">
+              <table id="userproperty_table" class="table table-striped table-bordered" style="width: 70%">
+                <thead>
+                  <tr>
+                    <th>Sr.No</th>
+                    <th>Property Name</th>
+                    <th>Owner Name</th>
+                    <th>Mobile No</th>
+                    <th> Email ID </th>
+                    <th style="width: 150px; display: table-cell;">Address</th>
+                    <th>City</th>
+                    <th>State</th>
+                    <th>Country</th>
+                    <th style="display:none;">UserId</th>
+                    <th>Status</th>
+                    <th>Feature Property</th>
+                    <th style="display:none;">Property Id</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+          <br>
+          <div class="div2"></div>
+          <!-- <div class="card-footer small text-muted">Updated yesterday at 11:59 PM</div> -->
+        </div>
+
+      </div>
+      <script type="text/javascript">
+        var baseURL = globalUrl;
+        var isSearch = false;
+
+        // function onDownload(e) {
+        //   var email = document.getElementById("emailInput").value;
+        //   var mobile = document.getElementById("mobileInput").value;
+        //   var city = document.getElementById("cityInput").value;
+        //   var state = document.getElementById("stateInput").value;
+        //   var country = document.getElementById("countryInput").value;
+        //   var firstName = document.getElementById("fnameInput").value;
+        //   var lastName = document.getElementById("lnameInput").value;
+        //   $.ajax({
+        //     type: "GET",
+        //     dataType: "json",
+        //     async: false,
+        //     'headers': { Authorization: localStorage.getItem('token') || '' },
+        //     url: baseURL + 'v1/users/' + sessionStorage.getItem('userId') + '/property/batch/available',
+        //     success: function () {
+        //       var today = new Date();
+        //       var dd = String(today.getDate()).padStart(2, '0');
+        //       var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+        //       var yyyy = today.getFullYear();
+        //       today = mm + '/' + dd + '/' + yyyy;
+        //       e.preventDefault();
+        //       var xhr = new XMLHttpRequest();
+        //       xhr.open('GET', baseURL + 'v1/users/' + sessionStorage.getItem('userId') + '/property/adminbatch/download', true);
+        //       xhr.responseType = 'blob';
+        //       xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+        //       xhr.setRequestHeader('Authorization', localStorage.getItem('token') || '');
+        //       xhr.onload = function (e) {
+        //         if (this.status == 200) {
+        //           var blob = new Blob([this.response], { type: 'application/vnd.ms-excel' });
+        //           var downloadUrl = URL.createObjectURL(blob);
+        //           var a = document.createElement("a");
+        //           a.href = downloadUrl;
+        //           a.download = "property" + today + ".xlsx";
+        //           document.body.appendChild(a);
+        //           a.click();
+        //         }
+        //       };
+        //       xhr.send();
+        //     },
+        //     error: function (jqXHR, textStatus, errorThrown) {
+        //       console.log('API error: ' + textStatus);
+        //     }
+        //   });
+        // }
+
+        // function onUpload() {
+        //   document.getElementById('propertyRecords').style.display = "none";
+        //   var fileData = new FormData();
+        //   var files = event.target.files;
+        //   if (files != null) {
+        //     fileData.append('file', files[0]);
+        //   }
+        //   // for (var pair of fileData.entries()) {
+        //   //     console.log(pair[0] + ', ' + pair[1]);
+        //   // }
+        //   $.ajax({
+        //     type: 'POST',
+        //     processData: false,
+        //     contentType: false,
+        //     mimeType: "multipart/form-data",
+        //     data: fileData,
+        //     async: false,
+        //     dataType: "json",
+        //     'headers': { Authorization: localStorage.getItem('token') || '' },
+        //     url: baseURL + 'v1/users/' + sessionStorage.getItem('userId') + '/property/batch/upload',
+        //     success: function (response) {
+        //       $('#resultModal').modal('show');
+        //       $('#edittable').html(response.message);
+        //       setTimeout(function () {
+        //         window.location.reload();
+        //       }, 5000);
+        //     },
+        //     error: function (xhr, textStatus, errorThrown) {
+        //       console.log("API Error : ", textStatus);
+        //     },
+        //   });
+        //   alert("upload clicked");
+        // }
+
+        function onSearch() {
+          if (document.getElementById("emailInput").value == "" && document.getElementById("emailInput1").value != "") {
+            var mailid = document.getElementById("emailInput1").value;
+            if (mailid) {
+              var v = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+              if (v.test(emailInput1.value) == false) {
+                $('#div1').empty();
+                $('.div2').empty();
+                document.getElementById("mail1").innerHTML = 'Invalid Email Address.';
+                document.getElementById("number1").innerHTML = "";
+                emailInput1.focus();
+                return false;
+
+              } else {
+                document.getElementById("mail1").innerHTML = "";
+                document.getElementById("number1").innerHTML = "";
+              }
+            }
+          } else if (document.getElementById("emailInput").value != "" && document.getElementById("emailInput1").value == "") {
+            var mailid = document.getElementById("emailInput").value;
+            if (mailid) {
+              var v = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+              if (v.test(emailInput.value) == false) {
+                $('#div1').empty();
+                $('.div2').empty();
+                document.getElementById("mail").innerHTML = 'Invalid Email Address.';
+                document.getElementById("number").innerHTML = "";
+                emailInput.focus();
+                return false;
+
+              } else {
+                document.getElementById("mail").innerHTML = "";
+                document.getElementById("number").innerHTML = "";
+              }
+            }
+          } else if (document.getElementById("mobileInput").value == "" && document.getElementById("mobileInput1").value != "") {
+            var mob = document.getElementById("mobileInput1").value;
+            if (mob) {
+              // For mobile number field
+              var r = 0;
+              for (y = 0; y < mob.length; y++) {
+                if ((mob.charCodeAt(y) >= 32 && mob.charCodeAt(y) <= 47) || (mob.charCodeAt(y) >= 58 && mob.charCodeAt(y) <= 255) || (mob.charCodeAt(y) >= 338 && mob.charCodeAt(y) <= 402) || (mob.charCodeAt(y) >= 8211 && mob.charCodeAt(y) <= 8482)) {
+                  r++;
+                }
+              }
+              if (r != 0) {
+                $('#div1').empty();
+                $('.div2').empty();
+                document.getElementById("number1").innerHTML = 'Please enter only numeric values in Mobile Number.';
+                document.getElementById("mail1").innerHTML = "";
+                document.getElementById("mobileInput1").focus();
+                return false;
+              }
+              else {
+                document.getElementById("number1").innerHTML = "";
+                document.getElementById("mail1").innerHTML = "";
+              }
+              if (mob.length > 10 || mob.length < 10) {
+                $('#div1').empty();
+                $('.div2').empty();
+                document.getElementById("number1").innerHTML = 'Mobile number should be of 10 digits';
+                document.getElementById("mail1").innerHTML = "";
+                document.getElementById("mobileInput1").focus();
+                return false;
+              }
+              else {
+                document.getElementById("number1").innerHTML = "";
+                document.getElementById("mail1").innerHTML = "";
+              }
+            }
+          } else if (document.getElementById("mobileInput").value != "" && document.getElementById("mobileInput1").value == "") {
+            var mob = document.getElementById("mobileInput").value;
+            if (mob) {
+              // For mobile number field
+              var r = 0;
+              for (y = 0; y < mob.length; y++) {
+                if ((mob.charCodeAt(y) >= 32 && mob.charCodeAt(y) <= 47) || (mob.charCodeAt(y) >= 58 && mob.charCodeAt(y) <= 255) || (mob.charCodeAt(y) >= 338 && mob.charCodeAt(y) <= 402) || (mob.charCodeAt(y) >= 8211 && mob.charCodeAt(y) <= 8482)) {
+                  r++;
+                }
+              }
+              if (r != 0) {
+                $('#div1').empty();
+                $('.div2').empty();
+                document.getElementById("number").innerHTML = 'Please enter only numeric values in Mobile Number.';
+                document.getElementById("mail").innerHTML = "";
+                document.getElementById("mobileInput").focus();
+                return false;
+              }
+              else {
+                document.getElementById("number").innerHTML = "";
+                document.getElementById("mail").innerHTML = "";
+              }
+              if (mob.length > 10 || mob.length < 10) {
+                $('#div1').empty();
+                $('.div2').empty();
+                document.getElementById("number").innerHTML = 'Mobile number should be of 10 digits';
+                document.getElementById("mail").innerHTML = "";
+                document.getElementById("mobileInput").focus();
+                return false;
+              }
+              else {
+                document.getElementById("number").innerHTML = "";
+                document.getElementById("mail").innerHTML = "";
+              }
+            }
+          }
+
+          $('#div1').empty();
+          $('.div2').empty();
+          if (document.getElementById("emailInput").value == "" && document.getElementById("emailInput1").value != "") {
+            var email = document.getElementById("emailInput1").value;
+            var mobile = "";
+            var city = "";
+          } else if (document.getElementById("emailInput").value != "" && document.getElementById("emailInput1").value == "") {
+            var email = document.getElementById("emailInput").value;
+            var mobile = "";
+            var city = "";
+          } else if (document.getElementById("mobileInput").value == "" && document.getElementById("mobileInput1").value != "") {
+            var mobile = document.getElementById("mobileInput1").value;
+            var email = "";
+            var city = "";
+          } else if (document.getElementById("mobileInput").value != "" && document.getElementById("mobileInput1").value == "") {
+            var mobile = document.getElementById("mobileInput").value;
+            var email = "";
+            var city = "";
+          } else if (document.getElementById("cityInput").value == "" && document.getElementById("cityInput1").value != "") {
+            var city = document.getElementById("cityInput1").value;
+            var email = "";
+            var mobile = "";
+          } else if (document.getElementById("cityInput").value != "" && document.getElementById("cityInput1").value == "") {
+            var city = document.getElementById("cityInput").value;
+            var email = "";
+            var mobile = "";
+          } else {
+            var email = "";
+            var mobile = "";
+            var city = "";
+          }
+          var state = document.getElementById("stateInput").value;
+          var country = document.getElementById("countryInput").value;
+          var firstName = document.getElementById("fnameInput").value;
+          var lastName = document.getElementById("lnameInput").value;
+          var dataList = {
+            "mobileNo1": mobile,
+            "address": "",
+            "firstName": firstName,
+            "lastName": lastName,
+            "emailId": email,
+            "state": state,
+            "city": city,
+            "countryCode": country,
+            "active": 99
+          }
+          $.ajax({
+            type: "POST",
+            contentType: "application/json",
+            dataType: 'json',
+            headers: {
+              "content-type": "application/json",
+              Authorization: localStorage.getItem('token') || ''
+            },
+            data: JSON.stringify(dataList),
+
+            url: baseURL + 'v1/admin/user',
+            success: function (result) {
+              document.getElementById("propertyRecords").style.display = "block";
+              var jsonResult = JSON.stringify(result);
+              if (jsonResult == "[]") {
+                $("#userproperty_table").dataTable().fnClearTable();
+                $("#userproperty_table").dataTable().fnDestroy();
+                $('.div2').html("<center><span style='color:red'>Record Not Found.</span></center>");
+              } else {
+                $("#userproperty_table").dataTable().fnClearTable();
+                $("#userproperty_table").dataTable().fnDestroy();
+                var cnt = 0;
+                var status;
+                var featureButton;
+                var propertyName;
+                $.each(result, function (i, item) {
+                  isActiveStatus = item.active;
+                  isHideStatus = item.isHide;
+                  if (isHideStatus == 1) {
+                    status = "Hide";
+                  } else if (isActiveStatus == 0 && isHideStatus == 0) {
+                    status = "Draft";
+                  } else if (isActiveStatus == 1 && isHideStatus == 0) {
+                    status = "Publish";
+                  }
+
+                  if (item.proprtyName == null || item.proprtyName == undefined) {
+                    propertyName = "";
+                  } else {
+                    propertyName = item.proprtyName;
+                  }
+
+                  if (item.featureProperty == 0) {
+                    featureButton = '<button class="btn btn-blue btn-rounded btn-large width-100" role="button" onclick="featureData()">Feature Property</button>';
+                  } else {
+                    featureButton = '<button class="btn btn-blue btn-rounded btn-large width-100" role="button" onclick="featureData()">Property Featured</button>';
+                  }
+
+                  $('<tr>').html('<td scope="row">' + (++cnt) + '</td><td>' + propertyName + '</td><td>' + item.fullName + '</td><td>' + item.mobileNo1 + '</td><td>' + item.emailId + '</td><td>' + item.addressLine1 + '</td><td>' + item.city + '</td><td>' + item.state + '</td><td>' + item.countryCode + '</td><td>' + status + '</td><td style="display:none;">' + item.userId + '</td><td>' + featureButton + '</td><td style="display:none;">' + item.propertyId + '</td>').appendTo('#userproperty_table');
+                });
+                $('#userproperty_table').DataTable({
+                  "scrollX": true,
+                  "ordering": false,
+                  "language": {
+                    "info": "Showing _END_ of _TOTAL_ Properties",
+                    "infoFiltered": ""
+                  }
+                });
+              }
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+              $('#div1').empty();
+              $('#div1').append("<center><span style='color:red'>Record Not Found.</span></center>");
+            }
+
+          });
+
+        }
+        var featureUpdate = {};
+
+        function featureData() {
+          var table = document.getElementById("userproperty_table");
+          var rows = table.getElementsByTagName("tr");
+          for (i = 0; i < rows.length; i++) {
+            var currentRow = table.rows[i];
+            var createClickHandler =
+              function (row) {
+                return function () {
+                  var userAttrId = row.cells[10].innerHTML;
+                  sessionStorage.setItem('userId', userAttrId);
+                  var el = row.cells[11].childNodes[0].textContent;
+                  if (el == "Feature Property") {
+                    // alert(row.cells[11].innerHTML);
+                    el = "Property featured";
+                    featureUpdate = {
+                      "propertyId": row.cells[12].innerHTML,
+                      "featureProperty": 1
+                    }
+                    // toastr.success("Property Featured");
+                  } else {
+                    el = "Feature Property";
+                    // alert(row.cells[11].innerHTML);
+                    featureUpdate = {
+                      "propertyId": row.cells[12].innerHTML,
+                      "featureProperty": 0
+                    }
+                    // toastr.info("Feature Property");
+                  }
+                  row.cells[11].childNodes[0].textContent = el;
+                  freatureUpdateData();
+                };
+              };
+            currentRow.onclick = createClickHandler(currentRow);
+          }
+        }
+
+        function freatureUpdateData() {
+          $.ajax({
+            type: 'PUT',
+            data: JSON.stringify(featureUpdate),
+            contentType: "application/json",
+            headers: {
+              "content-type": "application/json",
+              Authorization: localStorage.getItem('token') || ''
+            },
+            dataType: 'json',
+            url: baseURL + 'v1/user/' + sessionStorage.getItem('userId') + '/property/admin/feature',
+            success: function (result) {
+              // console.log("inside success");
+            },
+            error: function (xhr, textStatus, errorThrown) {
+              // console.log(JSON.stringify(proprty));
+              // console.log("Property not Updated");
+            },
+          });
+        }
+      </script>
+    </div>
+    <!-- /.content-wrapper -->
+
+  </div>
+  <!-- /#wrapper -->
+  <%- include footer.ejs %>
+</body>
+
+</html>

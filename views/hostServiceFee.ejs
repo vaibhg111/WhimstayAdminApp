@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Admin-Host Service Fee</title>
+    <style>
+        form {
+            margin: 20px 0;
+        }
+
+        form input,
+        button {
+            padding: 5px;
+        }
+
+        table {
+            width: 70%;
+            margin-bottom: 20px;
+            border-collapse: collapse;
+        }
+
+        table,
+        th,
+        td {
+            border: 1px solid #FC97B9;
+        }
+
+        table th,
+        table td {
+            padding: 10px;
+            text-align: center;
+        }
+
+        .percentBlock {
+            padding: 6px 12px;
+            font-size: 17px;
+            font-weight: 400;
+            line-height: 1;
+            color: #555;
+            text-align: center;
+            background-color: #eee;
+            border: 1px solid #ccc;
+        }
+
+        /* .dataTables_wrapper .dataTables_paginate .paginate_button {
+            padding: 0px;
+            margin-left: 0px;
+            display: inline;
+            border: 0px;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+            border: 0px;
+        } */
+    </style>
+
+</head>
+
+<body id="page-top">
+    <%- include header.ejs %>
+    <div id="wrapper">
+        <%- include sidenav.ejs %>
+        <div class="container-fluid">
+            <input type="hidden" value="<%= data %>" id="userId">
+            <input type="hidden" value="<%= pmcId %>" id="pmcId">
+            <input type="hidden" id="userProfileId" class="form-control">
+            <br><br>
+            <h6>Define Host Service Fee</h6><br />
+            <div class="row">
+                <div class="col-sm-5">
+                    <div class="form-group">
+                        <label>Service Fee Percentage: </label>
+                        <div class="input-group">
+                            <input type="number" class="form-control" id="servicePer" min="0" max="100" step="0.01"
+                                onInput="checkLength()" onkeypress="return check(event,value)" name="servicePer"><span
+                                class="percentBlock"><i class="fas fa-percent"></i></span>
+                        </div>
+                        <span id="servicePer1" style="color:red"></span>
+                        <!-- </div> -->
+                        <br>
+                        <label>Enter Template Name: </label>
+                        <div class="input-group">
+                            <input type="text" onkeypress="validateInput()" id="templateName">
+                        </div>
+                        <span id="templateName1" style="color:red"></span>
+                        <br><br>
+                        <div id="addTemplate"><button type="submit" onclick="savehostServiceFee()" id="saveServiceFee"
+                                class="btn btn-blue btn-rounded btn-large width-30">Save</button></div>
+                    </div>
+                </div>
+                <div class="col-sm-1"></div>
+                <div class="col-sm-5">
+                    <div id="showTemplate" style="overflow-y: scroll;height: 350px;"></div>
+                </div>
+            </div>
+        </div>
+        <script>
+            var baseURL = globalUrl;
+            var pmcId = document.getElementById("pmcId").value;
+            var userId = document.getElementById("userId").value;
+
+            function validateInput() {
+                document.getElementById("templateName1").innerHTML = "";
+                document.getElementById("servicePer3").innerHTML = "";
+                document.getElementById("templateName3").innerHTML = "";
+            }
+            $(document).ready(function () {
+                $.ajax({
+                    url: globalUrl + 'user/host/servicefee/all',
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: localStorage.getItem('token') || '',
+                    },
+                    type: 'GET',
+                    headers: {
+                        "content-type": "application/json",
+                        Authorization: localStorage.getItem('token') || ''
+                    },
+                    dataType: 'json',
+                    success: function (result, textStatus, xhr) {
+                        var resultSet = JSON.stringify(result);
+                        var showTemp = '';
+                        $.each(result, function (i, item) {
+                            showTemp += '<div class="col-md-12" style="margin-top: 15px;"><a href="#" id=' + item.servicefeeforhostId + ' onclick="hostTempId(this)" data-toggle="modal" data-target="#myModal_host">' + item.servicefeeforhostName + '</a> <a class="fa-pull-right"' +
+                                'href="#" id=' + item.servicefeeforhostId + ' onclick="hostTempId(this)" data-toggle="modal" data-target="#myModal_host"><i class="fas fa-edit"></i></a></div>'
+                        });
+                        $('#showTemplate').append(showTemp).attr({ class: "showTemp" });
+                        if (resultSet === "[]") {
+                            console.log("In empty");
+                            $('#showTemplate').css('height', 'auto');
+                        }
+                    },
+                    error: function (xhr, textStatus, errorThrown) {
+                        console.log('Error in Database');
+                        // console.log(errorThrown);
+                    }
+                });
+            });
+
+            function hostTempId(hostId) {
+                $('#myModal_host').modal('show');
+                $.ajax({
+                    url: globalUrl + 'user/host/servicefee/' + hostId.id,
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: localStorage.getItem('token') || '',
+                    },
+                    type: 'GET',
+                    headers: {
+                        "content-type": "application/json",
+                        Authorization: localStorage.getItem('token') || ''
+                    },
+                    dataType: 'json',
+                    success: function (result, textStatus, xhr) {
+
+                        sessionStorage.setItem("servicefeeforhostId", result.servicefeeforhostId);
+                        document.getElementById("templateName2").value = result.servicefeeforhostName
+                        document.getElementById("servicePer2").value = result.serviceFeePercentage;
+                    },
+                    error: function (xhr, textStatus, errorThrown) {
+                        console.log('Error in Database');
+                        // console.log(errorThrown);
+                    }
+                });
+            }
+
+            var point = false;
+            var count = 0;
+            function check(e, value) {
+                var unicode = e.charCode ? e.charCode : e.keyCode;
+
+                if (value == 100) {
+                    return false;
+                }
+
+                var idx = value.indexOf('.');
+                if (idx >= 0 && unicode != 45 && unicode != 46) {
+                    if (value.length - idx > 2) {
+                        e.target.value = value.substring(0, value.length - 1);
+                    }
+                }
+
+                if (idx != -1 && unicode == 46) {
+                    return false;
+                }
+
+                if (unicode == 45 && point == false) {
+                    point = true;
+                }
+                if (unicode != 8) if ((unicode < 48 || unicode > 57) && unicode != 46 && unicode == 45) return false;
+            }
+            function checkLength() {
+                document.getElementById("servicePer1").innerHTML = "";
+                var fieldVal = document.getElementById('servicePer').value;
+                //Suppose u want 3 number of character
+                if (fieldVal <= 100) {
+                    return true;
+                }
+                else {
+                    var str = document.getElementById('servicePer').value;
+                    str = 100;
+                    document.getElementById('servicePer').value = str;
+                }
+            }
+
+            function checkLength1() {
+                document.getElementById("servicePer3").innerHTML = "";
+                var fieldVal = document.getElementById('servicePer2').value;
+                //Suppose u want 3 number of character
+                if (fieldVal <= 100) {
+                    return true;
+                }
+                else {
+                    var str = document.getElementById('servicePer2').value;
+                    str = 100;
+                    document.getElementById('servicePer2').value = str;
+                }
+            }
+
+            // check = function (e, value) {
+            //     if(value.indexOf('-') != -1) {
+            //         e.preventDefault();
+            //     }
+
+            //     if (!e.target.validity.valid) {
+            //         e.target.value = value.substring(0, value.length - 1);
+            //         return false;
+            //     }
+
+            //     var idx = value.indexOf('.');
+            //     if (idx >= 0) {
+            //         if (value.length - idx > 3) {
+            //             e.target.value = value.substring(0, value.length - 1);
+            //             return false;
+            //         }
+            //     }
+            //     return true;
+            // }
+
+            function hostUpdate() {
+                if (document.getElementById("servicePer2").value == "" || document.getElementById("servicePer2").value == null || document.getElementById("servicePer2").value == undefined) {
+                    document.getElementById("servicePer3").innerHTML = "Please enter service percentage."
+                    return false;
+                } else {
+                    document.getElementById("servicePer3").innerHTML = "";
+                }
+
+                if (document.getElementById("templateName2").value == "" || document.getElementById("templateName2").value == null || document.getElementById("templateName2").value == undefined) {
+                    document.getElementById("templateName3").innerHTML = "Please enter Template Name";
+                    return false;
+                } else {
+                    document.getElementById("templateName3").innerHTML = "";
+                }
+
+                var servicefeeforhostId = sessionStorage.getItem("servicefeeforhostId");
+                var servicefeeforhostName = document.getElementById("templateName2").value;
+                var serviceFeePercentage = document.getElementById("servicePer2").value;
+                var editHost = {
+                    "servicefeeforhostId": servicefeeforhostId,
+                    "servicefeeforhostName": servicefeeforhostName,
+                    "serviceFeePercentage": serviceFeePercentage,
+                    "active": true
+                }
+                $('#myModal_host').modal('hide');
+                $.ajax({
+                    type: 'PUT',
+                    data: JSON.stringify(editHost),
+                    contentType: "application/json",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: localStorage.getItem('token') || '',
+                    },
+                    dataType: 'json',
+                    url: globalUrl + 'user/host/servicefee',
+                    success: function (result) {
+                        $('#myModal-hostFeeUpdate').modal('show');
+                        $.ajax({
+                            url: globalUrl + 'host/servicefee/apply/servicefeeforhostId/' + servicefeeforhostId,
+                            type: 'GET',
+                            dataType: 'json',
+                            headers: {
+                                "content-type": "application/json",
+                                Authorization: localStorage.getItem('token') || ''
+                            },
+                            success: function (result, textStatus, xhr) {
+                                console.log(JSON.stringify(result));
+                                $.each(result, function (i, item) {
+                                    if (item.hostFeePercentage == 0) {
+                                        $('<tr >').html('<td class="text-center"><input class=chk type="checkbox" id="' + item.name + '_' + item.pmcId + '_' + sessionStorage.getItem("servicefeeforhostId") + '" value="' + item.pmcId + '" name="hostSelect"></td><td>' + item.name + "</td><td>" + item.mobileNo + "</td>").appendTo('#hostFeeUpdate_table');
+                                    } else {
+                                        $('<tr>').html('<td class="text-center"><input class=chk type="checkbox" id="' + item.name + '_' + item.pmcId + '_' + sessionStorage.getItem("servicefeeforhostId") + '" value="' + item.pmcId + '" name="hostSelect" checked></td><td>' + item.name + "</td><td>" + item.mobileNo + "</td><br><br>").appendTo('#hostFeeUpdate_table');
+                                    }
+                                });
+                                $('#hostFeeUpdate_table').DataTable({
+                                    // "scrollY": "250px",
+                                    "bLengthChange": false,
+                                    "bFilter": true,
+                                    "bInfo": false,
+                                    "bAutoWidth": false,
+                                    "scrollCollapse": true
+                                });
+                            },
+                            error: function (xhr, textStatus, errorThrown) {
+                                console.log(xhr);
+                            }
+                        });
+                    }
+                });
+            }
+
+            function savehostServiceFee() {
+                if (document.getElementById("servicePer").value == "" || document.getElementById("servicePer").value == null || document.getElementById("servicePer").value == undefined) {
+                    document.getElementById("servicePer1").innerHTML = "Please enter service percentage."
+                    return false;
+                } else {
+                    document.getElementById("servicePer1").innerHTML = ""
+                }
+
+                if (document.getElementById("templateName").value == "" || document.getElementById("templateName").value == null || document.getElementById("templateName").value == undefined) {
+                    document.getElementById("templateName1").innerHTML = "Please enter Template Name";
+                    return false;
+                } else {
+                    document.getElementById("templateName1").innerHTML = "";
+                }
+
+                var templateName = document.getElementById("templateName").value;
+                var servicefeeHost = document.getElementById("servicePer").value;
+                var tempSave = {
+                    "servicefeeforhostName": templateName,
+                    "serviceFeePercentage": servicefeeHost,
+                    "active" : true
+                }
+                $.ajax({
+                    type: "POST",
+                    contentType: "application/json",
+                    dataType: 'json',
+                    headers: {
+                        "content-type": "application/json",
+                        Authorization: localStorage.getItem('token') || ''
+                    },
+                    data: JSON.stringify(tempSave),
+
+                    url: globalUrl + 'user/host/servicefee',
+                    success: function (result) {
+                        var servicefeeforhostId = result.servicefeeforhostId;
+                        sessionStorage.setItem("servicefeeforhostId", servicefeeforhostId);
+                        console.log(result);
+                        $.ajax({
+                            url: globalUrl + 'host/servicefee/apply/servicefeeforhostId/' + servicefeeforhostId,
+                            type: 'GET',
+                            headers: {
+                                "content-type": "application/json",
+                                Authorization: localStorage.getItem('token') || ''
+                            },
+                            dataType: 'json',
+                            success: function (result, textStatus, xhr) {
+                                console.log(JSON.stringify(result));
+                                $.each(result, function (i, item) {
+                                    if (item.servicefeeforhostId == 0 || item.servicefeeforhostId == null) {
+                                        $('<tr >').html('<td class="text-center"><input class=chk type="checkbox" id="' + item.name + '_' + item.pmcId + '_' + sessionStorage.getItem("servicefeeforhostId") + '" value="' + item.pmcId + '" name="hostSelect"></td><td>' + item.name + "</td><td>" + item.mobileNo + "</td>").appendTo('#hostFee_table');
+                                    } else {
+                                        $('<tr>').html('<td class="text-center"><input class=chk type="checkbox" id="' + item.name + '_' + item.pmcId + '_' + sessionStorage.getItem("servicefeeforhostId") + '" value="' + item.pmcId + '" name="hostSelect" checked></td><td>' + item.name + "</td><td>" + item.mobileNo + "</td><br><br>").appendTo('#hostFee_table');
+                                    }
+                                });
+                                $('#hostFee_table').DataTable({
+                                    // "scrollY": "250px",
+                                    "bLengthChange": false,
+                                    "bFilter": true,
+                                    "bInfo": false,
+                                    "bAutoWidth": false,
+                                    "scrollCollapse": true
+                                });
+                            },
+                            error: function (xhr, textStatus, errorThrown) {
+                                console.log(xhr);
+                            }
+                        });
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+
+                    }
+
+                });
+                $('#myModal-hostFee').modal('show');
+            }
+        </script>
+    </div>
+
+    <div id="myModal_host" class="modal fade in" role="dialog">
+        <div class="modal-dialog">
+
+
+            <div class="modal-content">
+                <div class="modal-header" style="display: block;">
+                    <button type="button" class="close" data-dismiss="modal">×</button>
+                    <!-- <h6 class="modal-title">Create a New Tax Template</h6> -->
+                    <div id="hostText">
+                        <h6 class="modal-title">Edit Host Template</h6>
+                    </div>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Service Fee Percentage: </label>
+                        <div class="input-group">
+                            <input type="number" class="form-control" id="servicePer2" min="0" max="100" step="0.01"
+                                onInput="checkLength1()" onkeypress="return check(event,value)" name="servicePer"><span
+                                class="percentBlock"><i class="fas fa-percent"></i></span>
+                        </div>
+                        <span id="servicePer3" style="color:red"></span>
+                        <!-- </div> -->
+                        <br>
+                        <label>Enter Template Name: </label>
+                        <div class="input-group">
+                            <input type="text" onkeypress="validateInput()" id="templateName2">
+                        </div>
+                        <span id="templateName3" style="color:red"></span>
+                        <button type="submit" id="edithost" data-target="#myModal-hostFeeUpdate"
+                            class="btn btn-blue btn-rounded btn-large width-100" onclick="hostUpdate()">Next</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="myModal-hostFee" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content" id="modal-width" style="width: 760px;">
+                <div class="modal-header" style="display: block;">
+                    <button type="button" onclick="javascript:window.location.reload()" class="close"
+                        data-dismiss="modal">&times;</button>
+                    <h6 class="modal-title">Apply Service Fee to Host</h6>
+                </div>
+                <div class="modal-body" style="overflow-y:scroll;height:500px;">
+                    <!-- float: right; margin-right: -30px !important;" -->
+                    <!-- <div id="propertyList"> -->
+                    <table id="hostFee_table" class="table table-striped table-bordered text-extra-small">
+                        <thead>
+                            <tr>
+                                <th style="width: 160px;"><input type="checkbox" id="checkAllHost"> Select</th>
+                                <th style="width: 160px;vertical-align: text-top;"> Host Name</th>
+                                <th style="vertical-align: text-top;">Mobile Number</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                    <!-- <div id="applyHost" style="margin-top: 10px; margin-right: 25px;"></div> -->
+                    <div class="text-center" style="margin-bottom: 15px;">
+                        <button type="submit" id="applyHost" class="btn btn-blue btn-rounded btn-large width-90"
+                            data-dismiss="modal">Apply Host
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <div id="myModal-hostFeeUpdate" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content" id="modal-width" style="width: 760px;">
+                <div class="modal-header" style="display: block;">
+                    <button type="button" onclick="javascript:window.location.reload()" class="close"
+                        data-dismiss="modal">&times;</button>
+                    <h6 class="modal-title">Apply Service Fee to Host</h6>
+                </div>
+                <div class="modal-body" style="overflow-y:scroll;height:500px;">
+                    <!-- float: right; margin-right: -30px !important;" -->
+                    <!-- <div id="propertyList"> -->
+                    <table id="hostFeeUpdate_table" class="table table-striped table-bordered text-extra-small">
+                        <thead>
+                            <tr>
+                                <th style="width: 140px;"><input type="checkbox" id="checkUpdatedHost"> Select</th>
+                                <th style="width: 160px;vertical-align: text-top;"> Host Name</th>
+                                <th style="vertical-align: text-top;">Mobile Number</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                    <!-- <div id="applyHost" style="margin-top: 10px; margin-right: 25px;"></div> -->
+                    <div class="text-center" style="margin-bottom: 15px;">
+                        <button type="submit" id="applyHostUpdate" class="btn btn-blue btn-rounded btn-large width-90"
+                            data-dismiss="modal">Update Host
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+    <!-- end share with a Host lightbox-->
+
+    <!-- script for new entry -->
+    <script>
+        var hostServiceFeeTemplateId1;
+
+        $("#checkAllHost").click(function () {
+            var oTable = $('#hostFee_table').dataTable();
+            var rowcollection = oTable.$(".chk", { "page": "all" });
+
+            if ($(this).hasClass('checkedAll')) {
+                $(rowcollection).prop('checked', false);
+                $(this).removeClass('checkedAll');
+            } else {
+                $(rowcollection).prop('checked', true);
+                $(this).addClass('checkedAll');
+            }
+
+        });
+
+        $('#applyHost').click(function () {
+            var hostInput = [];
+
+            var checkTable = $('#hostFee_table').dataTable();
+            var checkboxs = checkTable.$("input:checkbox[class=chk]:checked", { "page": "all" })
+            var okay = false;
+            for (var i = 0, l = checkboxs.length; i < l; i++) {
+                if (checkboxs[i].checked) {
+                    okay = true;
+                    break;
+                }
+            }
+            if (okay) {
+
+            }
+            else {
+                window.location.reload();
+            }
+
+            var getTable = $('#hostFee_table').dataTable();
+            var getUpdatedData = getTable.$("input:checkbox[class=chk]:checked", { "page": "all" });
+            $(getUpdatedData).each(function () {
+                var id = $(this).attr("id");
+                var id = id.split('_');
+                hostServiceFeeTemplateId1 = id[2];
+
+                var testData1 = new Object();
+                testData1.pmcId = $(this).val();
+                testData1.servicefeeforhostId = hostServiceFeeTemplateId1;
+                testData1.hostFeePercentage = document.getElementById("servicePer").value;
+                testData1.active = true;
+                hostInput.push(testData1);
+
+            });
+
+            var getUncheckedData = getTable.$("input:checkbox[class=chk]:not(:checked)", { "page": "all" });
+            $(getUncheckedData).each(function () {
+
+                var testData1 = new Object();
+                testData1.pmcId = $(this).val();
+                testData1.servicefeeforhostId = hostServiceFeeTemplateId1;
+                testData1.hostFeePercentage = document.getElementById("servicePer").value;
+                testData1.active = false;
+                hostInput.push(testData1);
+
+            });
+            $.ajax({
+                type: 'POST',
+                data: JSON.stringify(hostInput),
+                contentType: "application/json",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: localStorage.getItem('token') || '',
+                },
+                dataType: 'json',
+                headers: {
+                    "content-type": "application/json",
+                    Authorization: localStorage.getItem('token') || ''
+                },
+                url: globalUrl + 'host/servicefee/apply',
+                success: function (result) {
+                    // console.log(result)
+                    window.location.reload();
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    console.log(xhr);
+                },
+            });
+        });
+
+    </script>
+
+    <!-- script for update -->
+    <script>
+        var hostServiceFeeTemplateId;
+
+        $("#checkUpdatedHost").click(function () {
+            var oTable = $('#hostFeeUpdate_table').dataTable();
+            var rowcollection = oTable.$(".chk", { "page": "all" });
+
+            if ($(this).hasClass('checkedAll')) {
+                $(rowcollection).prop('checked', false);
+                $(this).removeClass('checkedAll');
+            } else {
+                $(rowcollection).prop('checked', true);
+                $(this).addClass('checkedAll');
+            }
+
+        });
+
+
+        $('#applyHostUpdate').click(function () {
+            var hostInput = [];
+
+            var checkTable = $('#hostFeeUpdate_table').dataTable();
+            var checkboxs = checkTable.$("input:checkbox[class=chk]:checked", { "page": "all" })
+            var okay = false;
+            for (var i = 0, l = checkboxs.length; i < l; i++) {
+                if (checkboxs[i].checked) {
+                    okay = true;
+                    break;
+                }
+            }
+            if (okay) {
+
+            }
+            else {
+                window.location.reload();
+            }
+
+            var getTable = $('#hostFeeUpdate_table').dataTable();
+            var getUpdatedData = getTable.$("input:checkbox[class=chk]:checked", { "page": "all" });
+            $(getUpdatedData).each(function () {
+
+                var testData1 = new Object();
+                testData1.pmcId = $(this).val();
+                testData1.servicefeeforhostId = sessionStorage.getItem("servicefeeforhostId");
+                testData1.hostFeePercentage = document.getElementById("servicePer2").value;
+                testData1.active = true;
+                hostInput.push(testData1);
+            });
+
+            var getUncheckedData = getTable.$("input:checkbox[class=chk]:not(:checked)", { "page": "all" });
+            $(getUncheckedData).each(function () {
+
+                var testData1 = new Object();
+                testData1.pmcId = $(this).val();
+                testData1.servicefeeforhostId = 0;
+                testData1.hostFeePercentage = document.getElementById("servicePer2").value;
+                testData1.active = false;
+                hostInput.push(testData1);
+
+            });
+            $.ajax({
+                type: 'PUT',
+                data: JSON.stringify(hostInput),
+                contentType: "application/json",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: localStorage.getItem('token') || '',
+                },
+                dataType: 'json',
+                headers: {
+                    "content-type": "application/json",
+                    Authorization: localStorage.getItem('token') || ''
+                },
+                url: globalUrl + 'host/servicefee/apply',
+                success: function (result) {
+                    // console.log(result)
+                    window.location.reload();
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    console.log(xhr);
+                },
+            });
+        });
+    </script>
+    <%- include footer.ejs %>
+</body>
+
+</html>
